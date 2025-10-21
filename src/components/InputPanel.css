@@ -1,0 +1,19 @@
+/* 输入面板组件样式 */
+.input-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-panel .ant-input-outlined,
+.input-panel .ant-input {
+  background: rgba(255,255,255,0.04);
+  color: #e5e7eb;
+}
+
+.input-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}

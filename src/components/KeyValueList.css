@@ -1,0 +1,17 @@
+/* 键值对动态输入组件样式 */
+.kv-list {
+  margin-top: 8px;
+}
+
+.kv-row {
+  margin-bottom: 8px;
+}
+
+.kv-remove {
+  width: 100%;
+}
+
+.kv-list .ant-input {
+  background: rgba(255,255,255,0.03);
+  color: #e5e7eb;
+}

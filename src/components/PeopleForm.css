@@ -1,0 +1,26 @@
+/* 人物信息录入表单样式 */
+.people-form {
+  margin-top: 16px;
+  padding: 20px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.04);
+}
+
+.people-form .ant-form-item-label > label {
+  color: #cbd5e1;
+}
+
+.people-form .ant-input,
+.people-form .ant-input-affix-wrapper,
+.people-form .ant-select-selector,
+.people-form .ant-input-number,
+.people-form .ant-input-number-input {
+  background: rgba(255,255,255,0.03);
+  color: #e5e7eb;
+}
+
+.people-form .ant-select-selection-item,
+.people-form .ant-select-selection-placeholder {
+  color: #cbd5e1;
+}

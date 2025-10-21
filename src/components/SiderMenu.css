@@ -1,0 +1,19 @@
+/* 侧边菜单组件局部样式 */
+.sider-header { border-bottom: 1px solid rgba(255,255,255,0.08); }
+
+/* 收起时图标水平居中（仅 PC 端 Sider 使用） */
+.sider-header.collapsed { justify-content: center; }
+
+/* 移动端汉堡触发按钮位置 */
+.mobile-menu-trigger {
+  position: fixed;
+  left: 16px;
+  top: 16px;
+  z-index: 1100;
+}
+
+/* 移动端 Drawer 背景与滚动 */
+.mobile-menu-drawer .ant-drawer-body {
+  background: #0f172a; /* 与页面暗色一致 */
+  padding: 0;
+}
