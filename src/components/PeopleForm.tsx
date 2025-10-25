@@ -1,18 +1,84 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Input, Select, InputNumber, Button, message, Row, Col } from 'antd';
 import './PeopleForm.css';
 import KeyValueList from './KeyValueList.tsx'
+import { createPeople } from '../apis';
 
 const { TextArea } = Input;
 
-const PeopleForm: React.FC = () => {
-  const [form] = Form.useForm();
+interface PeopleFormProps {
+  initialData?: any;
+}
 
-  const onFinish = (values: any) => {
-    // 暂时打印内容，模拟提交
-    console.log('People form submit:', values);
-    message.success('表单已提交');
-    form.resetFields();
+const PeopleForm: React.FC<PeopleFormProps> = ({ initialData }) => {
+  const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
+
+  // 当 initialData 变化时，自动填充表单
+  useEffect(() => {
+    if (initialData) {
+      console.log('收到API返回数据，自动填充表单:', initialData);
+      
+      // 处理返回的数据，将其转换为表单需要的格式
+      const formData: any = {};
+      
+      if (initialData.name) formData.name = initialData.name;
+      if (initialData.gender) formData.gender = initialData.gender;
+      if (initialData.age) formData.age = initialData.age;
+      if (initialData.height) formData.height = initialData.height;
+      if (initialData.marital_status) formData.marital_status = initialData.marital_status;
+      if (initialData.match_requirement) formData.match_requirement = initialData.match_requirement;
+      if (initialData.introduction) formData.introduction = initialData.introduction;
+      
+      // 设置表单字段值
+      form.setFieldsValue(formData);
+      
+      // 显示成功消息
+      message.success('已自动填充表单，请检查并确认信息');
+    }
+  }, [initialData, form]);
+
+  const onFinish = async (values: any) => {
+    setLoading(true);
+    
+    try {
+      const peopleData = {
+        name: values.name,
+        gender: values.gender,
+        age: values.age,
+        height: values.height || undefined,
+        marital_status: values.marital_status || undefined,
+        introduction: values.introduction || {},
+        match_requirement: values.match_requirement || undefined,
+      };
+
+      console.log('提交人员数据:', peopleData);
+      
+      const response = await createPeople(peopleData);
+      
+      console.log('API响应:', response);
+      
+      if (response.error_code === 0) {
+        message.success('人员信息已成功提交到后端！');
+        form.resetFields();
+      } else {
+        message.error(response.error_info || '提交失败，请重试');
+      }
+      
+    } catch (error: any) {
+      console.error('提交失败:', error);
+      
+      // 根据错误类型显示不同的错误信息
+      if (error.status === 422) {
+        message.error('表单数据格式有误，请检查输入内容');
+      } else if (error.status >= 500) {
+        message.error('服务器错误，请稍后重试');
+      } else {
+        message.error(error.message || '提交失败，请重试');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -75,8 +141,8 @@ const PeopleForm: React.FC = () => {
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit" block>
-            提交
+          <Button type="primary" htmlType="submit" loading={loading} block>
+            {loading ? '提交中...' : '提交'}
           </Button>
         </Form.Item>
       </Form>

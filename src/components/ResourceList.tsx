@@ -1,33 +1,50 @@
 import React from 'react';
-import { Layout, Typography, Table, Grid, InputNumber, Button, Space, Tag } from 'antd';
+import { Layout, Typography, Table, Grid, InputNumber, Button, Space, Tag, message } from 'antd';
 import type { ColumnsType, ColumnType } from 'antd/es/table';
 import type { FilterDropdownProps } from 'antd/es/table/interface';
 import type { TableProps } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import './MainContent.css';
+import { getPeoples } from '../apis';
+import type { People } from '../apis';
 
 const { Content } = Layout;
 
-// 数据类型定义
+// 数据类型定义 - 使用 API 中的 People 类型
 export type DictValue = Record<string, string>;
-export type Resource = {
-  id: string;
-  name: string;
-  gender: '男' | '女' | '其他/保密' | string;
-  age: number;
-  height?: number;
-  marital_status?: string;
-  introduction?: DictValue;
-};
+export type Resource = People;
 
-// 模拟从后端获取资源列表（真实环境替换为实际接口）
+// 获取人员列表数据
 async function fetchResources(): Promise<Resource[]> {
   try {
-    const res = await fetch('/api/resources');
-    if (!res.ok) throw new Error('network');
-    const data = await res.json();
-    return data as Resource[];
-  } catch (e) {
+    const response = await getPeoples({
+      limit: 1000, // 获取大量数据用于前端分页和筛选
+      offset: 0
+    });
+    
+    // 检查响应是否成功
+    if (response.error_code !== 0) {
+      console.error('API错误:', response.error_info);
+      message.error(response.error_info || '获取数据失败');
+      // 返回空数组或使用 mock 数据作为后备
+      return [];
+    }
+    
+    // 转换数据格式以匹配组件期望的结构
+    return response.data?.map((person: any) => ({
+      id: person.id || `person-${Date.now()}-${Math.random()}`,
+      name: person.name || '未知',
+      gender: person.gender || '其他/保密',
+      age: person.age || 0,
+      height: person.height,
+      marital_status: person.marital_status,
+      introduction: person.introduction || {},
+    })) || [];
+    
+  } catch (error: any) {
+    console.error('获取人员列表失败:', error);
+    message.error('获取人员列表失败，使用模拟数据');
+    
     // 回退到 mock 数据，便于本地开发
     return [
       {
@@ -415,7 +432,7 @@ async function fetchResources(): Promise<Resource[]> {
 }
 
 // 数字范围筛选下拉
-function buildNumberRangeFilter<T extends Resource>(dataIndex: keyof T, label: string): ColumnType<T> {
+function buildNumberRangeFilter(dataIndex: keyof Resource, label: string): ColumnType<Resource> {
   return {
     title: label,
     dataIndex,
@@ -476,7 +493,7 @@ function buildNumberRangeFilter<T extends Resource>(dataIndex: keyof T, label: s
       if (max !== undefined && val > max) return false;
       return true;
     },
-  } as ColumnType<T>;
+  } as ColumnType<Resource>;
 }
 
 const ResourceList: React.FC = () => {
@@ -592,7 +609,7 @@ const ResourceList: React.FC = () => {
                           }}
                         >
                           <span style={{ color: '#9ca3af' }}>{k}</span>
-                          <span style={{ color: '#e5e7eb' }}>{v}</span>
+                          <span style={{ color: '#e5e7eb' }}>{String(v)}</span>
                         </div>
                       ))}
                     </div>
