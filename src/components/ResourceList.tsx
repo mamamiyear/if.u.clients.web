@@ -501,7 +501,6 @@ const ResourceList: React.FC = () => {
   const isMobile = !screens.md;
   const [loading, setLoading] = React.useState(false);
   const [data, setData] = React.useState<Resource[]>([]);
-  const [pageSize, setPageSize] = React.useState<number>(10);
   const [pagination, setPagination] = React.useState<{ current: number; pageSize: number }>({ current: 1, pageSize: 10 });
 
   const handleTableChange: TableProps<Resource>['onChange'] = (pg) => {

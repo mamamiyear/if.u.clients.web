@@ -1,7 +1,6 @@
 // 基础请求工具函数
 
 import { API_CONFIG } from './config';
-import type { HTTPValidationError } from './types';
 
 // 请求选项接口
 export interface RequestOptions {
