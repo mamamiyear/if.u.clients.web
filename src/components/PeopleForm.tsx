@@ -23,6 +23,7 @@ const PeopleForm: React.FC<PeopleFormProps> = ({ initialData }) => {
       const formData: any = {};
       
       if (initialData.name) formData.name = initialData.name;
+      if (initialData.contact) formData.contact = initialData.contact;
       if (initialData.gender) formData.gender = initialData.gender;
       if (initialData.age) formData.age = initialData.age;
       if (initialData.height) formData.height = initialData.height;
@@ -50,6 +51,7 @@ const PeopleForm: React.FC<PeopleFormProps> = ({ initialData }) => {
         marital_status: values.marital_status || undefined,
         introduction: values.introduction || {},
         match_requirement: values.match_requirement || undefined,
+        contact: values.contact || undefined,
       };
 
       console.log('提交人员数据:', peopleData);
@@ -90,9 +92,18 @@ const PeopleForm: React.FC<PeopleFormProps> = ({ initialData }) => {
         onFinish={onFinish}
       >
 
-        <Form.Item name="name" label="姓名" rules={[{ required: true, message: '请输入姓名' }]}> 
-          <Input placeholder="如：张三" />
-        </Form.Item>
+        <Row gutter={[12, 12]}>
+          <Col xs={24} md={12}>
+            <Form.Item name="name" label="姓名" rules={[{ required: true, message: '请输入姓名' }]}> 
+              <Input placeholder="如：张三" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item name="contact" label="联系人">
+              <Input placeholder="如：李四（可留空）" />
+            </Form.Item>
+          </Col>
+        </Row>
 
         <Row gutter={[12, 12]}>
           <Col xs={24} md={6}>

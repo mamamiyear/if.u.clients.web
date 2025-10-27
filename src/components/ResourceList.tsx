@@ -39,6 +39,7 @@ async function fetchResources(): Promise<Resource[]> {
       height: person.height,
       marital_status: person.marital_status,
       introduction: person.introduction || {},
+      contact: person.contact || '',
     })) || [];
     
   } catch (error: any) {
@@ -554,6 +555,12 @@ const ResourceList: React.FC = () => {
           } as ColumnType<Resource>,
         ]
       : []),
+    {
+      title: '联系人',
+      dataIndex: 'contact',
+      key: 'contact',
+      render: (v: string) => (v ? v : '-'),
+    } as ColumnType<Resource>,
   ];
 
   return (

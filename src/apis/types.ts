@@ -49,6 +49,7 @@ export interface People {
   age?: number;
   height?: number;
   marital_status?: string;
+  contact?: string;
   [key: string]: any;
 }
 
