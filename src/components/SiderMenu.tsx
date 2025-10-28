@@ -1,6 +1,6 @@
 import React from 'react';
 import { Layout, Menu, Grid, Drawer, Button } from 'antd';
-import { CodeOutlined, HomeOutlined, UnorderedListOutlined, MenuOutlined } from '@ant-design/icons';
+import { HeartOutlined, FormOutlined, UnorderedListOutlined, MenuOutlined } from '@ant-design/icons';
 import './SiderMenu.css';
 
 const { Sider } = Layout;
@@ -32,9 +32,8 @@ const SiderMenu: React.FC<Props> = ({ onNavigate, selectedKey, mobileOpen, onMob
   }, [selectedKey]);
 
   const items = [
-    { key: 'home', label: '注册', icon: <HomeOutlined /> },
+    { key: 'home', label: '注册', icon: <FormOutlined /> },
     { key: 'menu1', label: '列表', icon: <UnorderedListOutlined /> },
-    // { key: 'menu2', label: '菜单2', icon: <AppstoreOutlined /> },
   ];
 
   // 移动端：使用 Drawer 覆盖主内容
@@ -61,7 +60,7 @@ const SiderMenu: React.FC<Props> = ({ onNavigate, selectedKey, mobileOpen, onMob
           styles={{ body: { padding: 0 } }}
         >
           <div className="sider-header">
-            <CodeOutlined style={{ fontSize: 22 }} />
+            <HeartOutlined style={{ fontSize: 22 }} />
             <div>
               <div className="sider-title">单身管理</div>
               <div className="sider-desc">录入、展示与搜索你的单身资源</div>
@@ -96,7 +95,7 @@ const SiderMenu: React.FC<Props> = ({ onNavigate, selectedKey, mobileOpen, onMob
       theme="dark"
     >
       <div className={`sider-header ${collapsed ? 'collapsed' : ''}`}>
-        <CodeOutlined style={{ fontSize: 22 }} />
+        <HeartOutlined style={{ fontSize: 22 }} />
         {!collapsed && (
           <div>
             <div className="sider-title">单身管理</div>
