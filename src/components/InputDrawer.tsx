@@ -43,7 +43,7 @@ const InputDrawer: React.FC<Props> = ({ open, onClose, onResult, containerEl }) 
       width={isMobile ? '100%' : '33%'}
       open={open}
       onClose={onClose}
-      mask={false}
+      mask
       getContainer={containerEl ? () => containerEl : undefined}
       closable={false}
       zIndex={1500}
@@ -58,7 +58,7 @@ const InputDrawer: React.FC<Props> = ({ open, onClose, onResult, containerEl }) 
           alignItems: 'center',
           justifyContent: 'center',
         },
-        mask: { top: topbarHeight, height: `calc(100% - ${topbarHeight}px)` },
+        // mask: { top: topbarHeight, height: `calc(100% - ${topbarHeight}px)`, backgroundColor: 'var(--mask)' },
       }}
     >
       <div className="input-drawer-inner">

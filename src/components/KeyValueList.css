@@ -12,6 +12,13 @@
 }
 
 .kv-list .ant-input {
-  background: rgba(255,255,255,0.03);
-  color: #e5e7eb;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.kv-list .ant-input::placeholder { color: var(--placeholder); }
+.kv-list .ant-input:focus {
+  border-color: var(--color-primary-600);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
 }

@@ -7,9 +7,17 @@
 
 .input-panel .ant-input-outlined,
 .input-panel .ant-input {
-  background: rgba(255,255,255,0.04);
-  color: #e5e7eb;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
   min-height: 180px; /* 提升基础高度，配合 autoSize 更宽裕 */
+}
+
+.input-panel .ant-input::placeholder { color: var(--placeholder); }
+.input-panel .ant-input:focus,
+.input-panel .ant-input-focused {
+  border-color: var(--color-primary-600);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
 }
 
 .input-actions {
@@ -18,3 +26,6 @@
   justify-content: flex-end;
   gap: 8px;
 }
+
+.input-actions .ant-btn-text { color: var(--text-secondary); }
+.input-actions .ant-btn-text:hover { color: var(--color-primary-600); }

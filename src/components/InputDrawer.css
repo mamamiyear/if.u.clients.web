@@ -1,6 +1,6 @@
-/* 右侧输入抽屉样式（参考示例配色） */
+/* 右侧输入抽屉样式（薄荷之春配色） */
 .input-drawer .ant-drawer-body {
-  background: #e9b6b6; /* 淡粉色背景，贴近参考图 */
+  background: var(--color-primary);
 }
 
 .input-drawer-inner {
@@ -11,13 +11,13 @@
 }
 .input-drawer-title {
   font-weight: 700;
-  color: #3b3b3b;
+  color: var(--text-primary);
   letter-spacing: 0.5px;
   text-align: center;
 }
 
 .input-drawer-box {
-  background: rgba(255,255,255,0.75);
+  background: var(--bg-card);
   border-radius: 12px;
   padding: 16px 18px; /* 增大内边距 */
   box-shadow: 0 1px 6px rgba(0,0,0,0.08);

@@ -566,7 +566,7 @@ const ResourceList: React.FC = () => {
   return (
     <Content className="main-content">
       <div className="content-body">
-        <Typography.Title level={3} style={{ color: '#e5e7eb', marginBottom: 12 }}>
+        <Typography.Title level={3} style={{ color: 'var(--text-primary)', marginBottom: 12 }}>
           资源列表
         </Typography.Title>
 

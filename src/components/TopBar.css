@@ -7,8 +7,8 @@
   display: grid;
   grid-template-columns: 56px 1fr 56px;
   align-items: center;
-  background: linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.35) 100%);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: linear-gradient(180deg, rgba(6, 78, 59, 0.55) 0%, rgba(6, 78, 59, 0.88) 100%);
+  border-bottom: 1px solid rgba(167, 243, 208, 0.25);
   backdrop-filter: blur(4px);
 }
 
@@ -18,7 +18,7 @@
   font-weight: 600;
   font-style: italic;
   letter-spacing: 1px;
-  color: #e5e7eb;
+  color: var(--text-invert);
 }
 
 .topbar-left,
@@ -35,11 +35,11 @@
   width: 36px;
   height: 36px;
   border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.04);
-  color: #93c5fd; /* 主题蓝 */
+  border: 1px solid rgba(255,255,255,0.16);
+  background: linear-gradient(180deg, rgba(16,185,129,0.15) 0%, rgba(16,185,129,0.25) 100%);
+  color: var(--color-primary-600);
 }
-.icon-btn:hover { background: rgba(255,255,255,0.08); }
+.icon-btn:hover { background: rgba(16,185,129,0.35); }
 
 @media (min-width: 768px) {
   .topbar { grid-template-columns: 56px 1fr 56px; }

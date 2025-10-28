@@ -17,11 +17,11 @@ const MainContent: React.FC<Props> = ({ inputOpen = false, onCloseInput, contain
   return (
     <Content className="main-content">
       <div className="content-body">
-        <Typography.Title level={3} style={{ color: '#e5e7eb', marginBottom: 12 }}>
+        <Typography.Title level={3} style={{ color: 'var(--text-primary)', marginBottom: 12 }}>
           ✨ 有新资源了吗?
         </Typography.Title>
-        <Typography.Paragraph style={{ color: '#a6adbb', marginBottom: 0 }}>
-          输入个人信息描述，上传图片，我将自动整理资源信息
+        <Typography.Paragraph style={{ color: 'var(--muted)', marginBottom: 0 }}>
+          点击右上角可以直接输入个人信息描述或上传图片，我将自动整理TA的信息
         </Typography.Paragraph>
 
         <PeopleForm initialData={formData} />
