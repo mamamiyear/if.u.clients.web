@@ -590,7 +590,7 @@ const ResourceList: React.FC = () => {
               return (
                 <div style={{ padding: '8px 24px' }}>
                   {isMobile && (
-                    <div style={{ display: 'flex', gap: 16, marginBottom: 12, color: '#cbd5e1' }}>
+                    <div style={{ display: 'flex', gap: 16, marginBottom: 12, color: '#434343ff' }}>
                       {record.height !== undefined && <div>身高: {record.height}</div>}
                       {record.marital_status && <div>婚姻状况: {record.marital_status}</div>}
                     </div>
@@ -614,8 +614,8 @@ const ResourceList: React.FC = () => {
                             wordBreak: 'break-word',
                           }}
                         >
-                          <span style={{ color: '#9ca3af' }}>{k}</span>
-                          <span style={{ color: '#e5e7eb' }}>{String(v)}</span>
+                          <span style={{ color: '#000000ff', fontWeight: 600 }}>{k}</span>
+                          <span style={{ color: '#2d2d2dff' }}>{String(v)}</span>
                         </div>
                       ))}
                     </div>
