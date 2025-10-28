@@ -19,6 +19,18 @@ const SiderMenu: React.FC<Props> = ({ onNavigate, selectedKey, mobileOpen, onMob
   const [collapsed, setCollapsed] = React.useState(false);
   const [selectedKeys, setSelectedKeys] = React.useState<string[]>(['home']);
   const [internalMobileOpen, setInternalMobileOpen] = React.useState(false);
+  const [topbarHeight, setTopbarHeight] = React.useState<number>(56);
+
+  React.useEffect(() => {
+    const update = () => {
+      const el = document.querySelector('.topbar') as HTMLElement | null;
+      const h = el?.clientHeight || 56;
+      setTopbarHeight(h);
+    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
 
   React.useEffect(() => {
     setCollapsed(isMobile);
@@ -57,7 +69,8 @@ const SiderMenu: React.FC<Props> = ({ onNavigate, selectedKey, mobileOpen, onMob
           width="100%"
           open={open}
           onClose={() => setOpen(false)}
-          styles={{ body: { padding: 0 } }}
+          rootStyle={{ top: topbarHeight, height: `calc(100% - ${topbarHeight}px)` }}
+          styles={{ body: { padding: 0 }, header: { display: 'none' } }}
         >
           <div className="sider-header">
             <HeartOutlined style={{ fontSize: 22 }} />

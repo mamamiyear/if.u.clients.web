@@ -52,8 +52,8 @@ const LayoutWrapper: React.FC = () => {
     <Layout className="layout-wrapper app-root">
       {/* 顶部标题栏，位于左侧菜单栏之上 */}
       <TopBar
-        onToggleMenu={() => setMobileMenuOpen((v) => !v)}
-        onToggleInput={() => isHome && setInputOpen((v) => !v)}
+        onToggleMenu={() => {setInputOpen(false); setMobileMenuOpen((v) => !v);}}
+        onToggleInput={() => {if (isHome) {setMobileMenuOpen(false); setInputOpen((v) => !v);}}}
         isHome={isHome}
       />
       {/* 下方为主布局：左侧菜单 + 右侧内容 */}
