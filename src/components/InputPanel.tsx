@@ -88,8 +88,9 @@ const InputPanel: React.FC<InputPanelProps> = ({ onResult }) => {
         <TextArea
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          placeholder="请输入个人信息描述，或点击右侧上传图片…"
-          autoSize={{ minRows: 3, maxRows: 6 }}
+          placeholder="请输入个人信息描述，或上传图片…"
+          autoSize={{ minRows: 6, maxRows: 12 }}
+          style={{ fontSize: 14 }}
           onKeyDown={onKeyDown}
           disabled={loading}
         />

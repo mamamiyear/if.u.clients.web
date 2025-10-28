@@ -6,14 +6,19 @@ import './SiderMenu.css';
 const { Sider } = Layout;
 
 // 新增：支持外部导航回调 + 受控选中态
-type Props = { onNavigate?: (key: string) => void; selectedKey?: string };
+type Props = {
+  onNavigate?: (key: string) => void;
+  selectedKey?: string;
+  mobileOpen?: boolean; // 外部控制移动端抽屉开关
+  onMobileToggle?: (open: boolean) => void; // 顶栏触发开关
+};
 
-const SiderMenu: React.FC<Props> = ({ onNavigate, selectedKey }) => {
+const SiderMenu: React.FC<Props> = ({ onNavigate, selectedKey, mobileOpen, onMobileToggle }) => {
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
   const [collapsed, setCollapsed] = React.useState(false);
   const [selectedKeys, setSelectedKeys] = React.useState<string[]>(['home']);
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [internalMobileOpen, setInternalMobileOpen] = React.useState(false);
 
   React.useEffect(() => {
     setCollapsed(isMobile);
@@ -34,20 +39,25 @@ const SiderMenu: React.FC<Props> = ({ onNavigate, selectedKey }) => {
 
   // 移动端：使用 Drawer 覆盖主内容
   if (isMobile) {
+    const open = mobileOpen ?? internalMobileOpen;
+    const setOpen = (v: boolean) => (onMobileToggle ? onMobileToggle(v) : setInternalMobileOpen(v));
+    const showInternalTrigger = !onMobileToggle; // 若无外部控制，则显示内部按钮
     return (
       <>
-        <Button
-          className="mobile-menu-trigger"
-          type="default"
-          icon={<MenuOutlined />}
-          onClick={() => setMobileOpen((open) => !open)}
-        />
+        {showInternalTrigger && (
+          <Button
+            className="mobile-menu-trigger"
+            type="default"
+            icon={<MenuOutlined />}
+            onClick={() => setInternalMobileOpen((o) => !o)}
+          />
+        )}
         <Drawer
           className="mobile-menu-drawer"
           placement="left"
           width="100%"
-          open={mobileOpen}
-          onClose={() => setMobileOpen(false)}
+          open={open}
+          onClose={() => setOpen(false)}
           styles={{ body: { padding: 0 } }}
         >
           <div className="sider-header">
@@ -64,7 +74,7 @@ const SiderMenu: React.FC<Props> = ({ onNavigate, selectedKey }) => {
             onClick={({ key }) => {
               const k = String(key);
               setSelectedKeys([k]);
-              setMobileOpen(false); // 选择后自动收起
+              setOpen(false); // 选择后自动收起
               onNavigate?.(k);
             }}
             items={items}

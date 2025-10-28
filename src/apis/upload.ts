@@ -15,7 +15,7 @@ export async function postInputImage(file: File): Promise<ApiResponse> {
     throw new Error('只能上传图片文件');
   }
   
-  return upload<ApiResponse>(API_ENDPOINTS.INPUT_IMAGE, file, 'image', { timeout: 30000 });
+  return upload<ApiResponse>(API_ENDPOINTS.INPUT_IMAGE, file, 'image', { timeout: 120000 });
 }
 
 /**
@@ -75,7 +75,7 @@ export async function postInputImageWithProgress(
 
     // 发送请求
     xhr.open('POST', `http://127.0.0.1:8099${API_ENDPOINTS.INPUT_IMAGE}`);
-    xhr.timeout = 30000; // 30秒超时
+    xhr.timeout = 120000; // 30秒超时
     xhr.send(formData);
   });
 }

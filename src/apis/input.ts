@@ -12,7 +12,7 @@ import type { PostInputRequest, ApiResponse } from './types';
 export async function postInput(text: string): Promise<ApiResponse> {
   const requestData: PostInputRequest = { text };
   // 为 postInput 设置 30 秒超时时间
-  return post<ApiResponse>(API_ENDPOINTS.INPUT, requestData, { timeout: 30000 });
+  return post<ApiResponse>(API_ENDPOINTS.INPUT, requestData, { timeout: 120000 });
 }
 
 /**
@@ -22,5 +22,5 @@ export async function postInput(text: string): Promise<ApiResponse> {
  */
 export async function postInputData(data: PostInputRequest): Promise<ApiResponse> {
   // 为 postInputData 设置 30 秒超时时间
-  return post<ApiResponse>(API_ENDPOINTS.INPUT, data, { timeout: 30000 });
+  return post<ApiResponse>(API_ENDPOINTS.INPUT, data, { timeout: 120000 });
 }

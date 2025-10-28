@@ -1,13 +1,13 @@
 import React from 'react';
 import { Layout, Typography } from 'antd';
 import PeopleForm from './PeopleForm.tsx';
-import InputPanel from './InputPanel.tsx';
-import HintText from './HintText.tsx';
+import InputDrawer from './InputDrawer.tsx';
 import './MainContent.css';
 
 const { Content } = Layout;
 
-const MainContent: React.FC = () => {
+type Props = { inputOpen?: boolean; onCloseInput?: () => void; containerEl?: HTMLElement | null };
+const MainContent: React.FC<Props> = ({ inputOpen = false, onCloseInput, containerEl }) => {
   const [formData, setFormData] = React.useState<any>(null);
 
   const handleInputResult = (data: any) => {
@@ -27,10 +27,13 @@ const MainContent: React.FC = () => {
         <PeopleForm initialData={formData} />
       </div>
 
-      <div className="input-panel-wrapper">
-        <InputPanel onResult={handleInputResult} />
-        <HintText />
-      </div>
+      {/* 首页右侧输入抽屉，仅在顶栏点击后弹出；挂载到标题栏下方容器 */}
+      <InputDrawer
+        open={inputOpen}
+        onClose={onCloseInput || (() => {})}
+        onResult={handleInputResult}
+        containerEl={containerEl}
+      />
     </Content>
   );
 };

@@ -1,0 +1,40 @@
+/* 右侧输入抽屉样式（参考示例配色） */
+.input-drawer .ant-drawer-body {
+  background: #e9b6b6; /* 淡粉色背景，贴近参考图 */
+}
+
+.input-drawer-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center; /* 居中内部内容 */
+}
+.input-drawer-title {
+  font-weight: 700;
+  color: #3b3b3b;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+.input-drawer-box {
+  background: rgba(255,255,255,0.75);
+  border-radius: 12px;
+  padding: 16px 18px; /* 增大内边距 */
+  box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+  width: 100%;
+  max-width: 680px; /* 桌面居中显示更宽 */
+  margin: 0 auto; /* 水平居中 */
+  box-sizing: border-box;
+}
+
+/* 抽屉底部按钮区域与页面底栏保持间距（如有） */
+.input-drawer .ant-drawer-footer { border-top: none; }
+
+/* 抽屉与遮罩不再额外向下偏移，依赖 getContainer 挂载到标题栏下方的容器 */
+
+@media (max-width: 768px) {
+  .input-drawer-box {
+    max-width: 100%;
+    padding: 14px; /* 移动端更紧凑 */
+  }
+}

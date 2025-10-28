@@ -2,13 +2,14 @@
 .input-panel {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px; /* 增大间距 */
 }
 
 .input-panel .ant-input-outlined,
 .input-panel .ant-input {
   background: rgba(255,255,255,0.04);
   color: #e5e7eb;
+  min-height: 180px; /* 提升基础高度，配合 autoSize 更宽裕 */
 }
 
 .input-actions {
