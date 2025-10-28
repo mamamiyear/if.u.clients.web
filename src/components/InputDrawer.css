@@ -8,8 +8,11 @@
   flex-direction: column;
   gap: 16px;
   align-items: center; /* 居中内部内容 */
+  width: 100%;
 }
+
 .input-drawer-title {
+  font-size: 24px;
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: 0.5px;
