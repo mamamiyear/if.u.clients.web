@@ -1,9 +1,9 @@
 import React from 'react';
-import { Layout, Typography, Table, Grid, InputNumber, Button, Space, Tag, message, Modal, Dropdown } from 'antd';
+import { Layout, Typography, Table, Grid, InputNumber, Button, Space, Tag, message, Modal, Dropdown, Input } from 'antd';
 import type { ColumnsType, ColumnType } from 'antd/es/table';
 import type { FilterDropdownProps } from 'antd/es/table/interface';
 import type { TableProps } from 'antd';
-import { SearchOutlined, EllipsisOutlined, DeleteOutlined } from '@ant-design/icons';
+import { SearchOutlined, EllipsisOutlined, DeleteOutlined, ManOutlined, WomanOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import './MainContent.css';
 import InputDrawer from './InputDrawer.tsx';
 import { getPeoples } from '../apis';
@@ -513,7 +513,7 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
   const [loading, setLoading] = React.useState(false);
   const [data, setData] = React.useState<Resource[]>([]);
   const [pagination, setPagination] = React.useState<{ current: number; pageSize: number }>({ current: 1, pageSize: 10 });
-  const [inputResult, setInputResult] = React.useState<any>(null);
+  // const [inputResult, setInputResult] = React.useState<any>(null);
   const [swipedRowId, setSwipedRowId] = React.useState<string | null>(null);
   const touchStartRef = React.useRef<{ x: number; y: number } | null>(null);
 
@@ -570,32 +570,59 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
       title: '姓名',
       dataIndex: 'name',
       key: 'name',
-      filters: !isMobile ? data
-        .filter(item => item.name) // 过滤掉 name 为空的项
-        .map((item) => ({ text: item.name!, value: item.name! })) : undefined,
-      filterSearch: !isMobile,
-      onFilter: (filterValue: React.Key | boolean, record: Resource) => !isMobile && String(record.name).includes(String(filterValue)),
-      render: (text: string) => <span style={{ fontWeight: 600 }}>{text}</span>,
-    },
-    {
-      title: '性别',
-      dataIndex: 'gender',
-      key: 'gender',
-      filters: [
-        { text: '男', value: '男' },
-        { text: '女', value: '女' },
-        { text: '其他/保密', value: '其他/保密' },
-      ],
-      onFilter: (value: React.Key | boolean, record: Resource) => String(record.gender) === String(value),
-      render: (g: string) => {
-        const color = g === '男' ? 'blue' : g === '女' ? 'magenta' : 'default';
-        return <Tag color={color}>{g}</Tag>;
+      filterIcon: <SearchOutlined />,
+      filterDropdown: ({ selectedKeys, setSelectedKeys, confirm }) => {
+        return (
+          <div className="byte-table-custom-filter">
+              <Input.Search
+                  placeholder="搜索资源..."
+                  value={selectedKeys[0] || ""}
+                  onChange={(e) => {
+                      setSelectedKeys(e.target.value ? [e.target.value] : []);
+                  }}
+                  onSearch={() => {
+                      confirm();
+                  }}
+              />
+          </div>
+        );
+      },
+      onFilter: (filterValue: React.Key | boolean, record: Resource) => String(record.name).includes(String(filterValue)),
+      render: (text: string, record: Resource) => {
+        if (!isMobile) return <span style={{ fontWeight: 600 }}>{text}</span>;
+        const g = record.gender;
+        const icon = g === '男'
+          ? <ManOutlined style={{ color: '#1677ff' }} />
+          : g === '女'
+            ? <WomanOutlined style={{ color: '#eb2f96' }} />
+            : <ExclamationCircleOutlined style={{ color: '#9ca3af' }} />;
+        return (
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontWeight: 600 }}>{text}</span>
+            {icon}
+          </span>
+        );
       },
     },
-    buildNumberRangeFilter('age', '年龄'),
     // 非移动端显示更多列
     ...(!isMobile
       ? [
+          {
+            title: '性别',
+            dataIndex: 'gender',
+            key: 'gender',
+            filters: [
+              { text: '男', value: '男' },
+              { text: '女', value: '女' },
+              { text: '其他/保密', value: '其他/保密' },
+            ],
+            onFilter: (value: React.Key | boolean, record: Resource) => String(record.gender) === String(value),
+            render: (g: string) => {
+              const color = g === '男' ? 'blue' : g === '女' ? 'magenta' : 'default';
+              return <Tag color={color}>{g}</Tag>;
+            },
+          },
+          buildNumberRangeFilter('age', '年龄'),
           buildNumberRangeFilter('height', '身高'),
           {
             title: '婚姻状况',
@@ -608,6 +635,24 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
       title: '联系人',
       dataIndex: 'contact',
       key: 'contact',
+      filterIcon: <SearchOutlined />,
+      filterDropdown: ({ selectedKeys, setSelectedKeys, confirm }) => {
+        return (
+          <div className="byte-table-custom-filter">
+              <Input.Search
+                  placeholder="搜索联系人..."
+                  value={selectedKeys[0] || ""}
+                  onChange={(e) => {
+                      setSelectedKeys(e.target.value ? [e.target.value] : []);
+                  }}
+                  onSearch={() => {
+                      confirm();
+                  }}
+              />
+          </div>
+        );
+      },
+      onFilter: (filterValue: React.Key | boolean, record: Resource) => String(record.contact).includes(String(filterValue)),
       render: (v: string, record: Resource) => {
         if (!isMobile) return v ? v : '-';
         return (
@@ -722,8 +767,9 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
                 <div style={{ padding: '8px 24px' }}>
                   {isMobile && (
                     <div style={{ display: 'flex', gap: 16, marginBottom: 12, color: '#434343ff' }}>
-                      {record.height !== undefined && <div>身高: {record.height}</div>}
-                      {record.marital_status && <div>婚姻状况: {record.marital_status}</div>}
+                      {record.age !== undefined && <div><span style={{ color: '#000000ff', fontWeight: 600 }}>年龄:</span> <span style={{ color: '#2d2d2dff' }}>{record.age}</span></div>}
+                      {record.height !== undefined && <div><span style={{ color: '#000000ff', fontWeight: 600 }}>身高:</span> <span style={{ color: '#2d2d2dff' }}>{record.height}</span></div>}
+                      {record.marital_status && <div><span style={{ color: '#000000ff', fontWeight: 600 }}>婚姻状况:</span> <span style={{ color: '#2d2d2dff' }}>{record.marital_status}</span></div>}
                     </div>
                   )}
                   {intro.length > 0 ? (
@@ -764,7 +810,7 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
         open={inputOpen}
         onClose={onCloseInput || (() => {})}
         onResult={(list: any) => {
-          setInputResult(list);
+          // setInputResult(list);
           const mapped = transformPeoples(Array.isArray(list) ? list : []);
           setData(mapped);
           // 回到第一页，保证用户看到最新结果
