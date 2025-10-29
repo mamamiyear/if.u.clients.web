@@ -1,19 +1,21 @@
 import React from 'react';
-import { Layout, Typography, Table, Grid, InputNumber, Button, Space, Tag, message } from 'antd';
+import { Layout, Typography, Table, Grid, InputNumber, Button, Space, Tag, message, Modal, Dropdown } from 'antd';
 import type { ColumnsType, ColumnType } from 'antd/es/table';
 import type { FilterDropdownProps } from 'antd/es/table/interface';
 import type { TableProps } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import { SearchOutlined, EllipsisOutlined, DeleteOutlined } from '@ant-design/icons';
 import './MainContent.css';
 import InputDrawer from './InputDrawer.tsx';
 import { getPeoples } from '../apis';
 import type { People } from '../apis';
+import { deletePeople } from '../apis/people';
 
 const { Content } = Layout;
 
 // 数据类型定义 - 使用 API 中的 People 类型
 export type DictValue = Record<string, string>;
-export type Resource = People;
+// 资源行类型：确保 id 一定存在且为 string，避免在使用处出现 "string | undefined" 类型问题
+export type Resource = Omit<People, 'id'> & { id: string };
 
 // 统一转换 API 返回的人员列表为表格需要的结构
 function transformPeoples(list: People[] = []): Resource[] {
@@ -512,6 +514,8 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
   const [data, setData] = React.useState<Resource[]>([]);
   const [pagination, setPagination] = React.useState<{ current: number; pageSize: number }>({ current: 1, pageSize: 10 });
   const [inputResult, setInputResult] = React.useState<any>(null);
+  const [swipedRowId, setSwipedRowId] = React.useState<string | null>(null);
+  const touchStartRef = React.useRef<{ x: number; y: number } | null>(null);
 
   const handleTableChange: TableProps<Resource>['onChange'] = (pg) => {
     setPagination({ current: pg?.current ?? 1, pageSize: pg?.pageSize ?? 10 });
@@ -529,6 +533,37 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
       mounted = false;
     };
   }, []);
+
+  const reloadResources = async () => {
+    setLoading(true);
+    const list = await fetchResources();
+    setData(list);
+    setLoading(false);
+  };
+
+  const confirmDelete = (id: string) => {
+    Modal.confirm({
+      title: '确认删除',
+      content: '删除后不可恢复，是否继续？',
+      okText: '确认',
+      cancelText: '取消',
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        try {
+          const res = await deletePeople(id);
+          if (res.error_code === 0) {
+            message.success('删除成功');
+          } else {
+            message.error(res.error_info || '删除失败');
+          }
+        } catch (err: any) {
+          message.error('删除失败');
+        } finally {
+          await reloadResources();
+        }
+      },
+    });
+  };
 
   const columns: ColumnsType<Resource> = [
     {
@@ -573,8 +608,66 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
       title: '联系人',
       dataIndex: 'contact',
       key: 'contact',
-      render: (v: string) => (v ? v : '-'),
+      render: (v: string, record: Resource) => {
+        if (!isMobile) return v ? v : '-';
+        return (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ flex: 1 }}>{v ? v : '-'}</span>
+            {swipedRowId === record.id && (
+              <Button
+                type="primary"
+                danger
+                size="small"
+                icon={<DeleteOutlined />}
+                onClick={() => confirmDelete(record.id)}
+              />
+            )}
+          </div>
+        );
+      },
     } as ColumnType<Resource>,
+    // 非移动端显示操作列
+        ...(!isMobile
+          ? ([{
+              title: '操作',
+              key: 'actions',
+              width: 80,
+              render: (_: any, record: Resource) => (
+                <Dropdown
+                  trigger={["click"]}
+                  menu={{
+                    items: [
+                      {
+                        key: 'delete',
+                        label: '删除',
+                        icon: (
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              width: 18,
+                              height: 18,
+                              borderRadius: 4,
+                              backgroundColor: '#f5222d',
+                              color: '#fff',
+                            }}
+                          >
+                            <DeleteOutlined style={{ fontSize: 12 }} />
+                          </span>
+                        ),
+                      },
+                    ],
+                    onClick: ({ key }) => {
+                      if (key === 'delete') confirmDelete(record.id);
+                    },
+                  }}
+                >
+                  <Button type="text" icon={<EllipsisOutlined />} />
+                </Dropdown>
+              ),
+            }] as ColumnsType<Resource>)
+          : ([] as ColumnsType<Resource>)),
   ];
 
   return (
@@ -589,6 +682,30 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
           loading={loading}
           columns={columns}
           dataSource={data}
+          onRow={(record) =>
+            isMobile
+              ? {
+                  onTouchStart: (e) => {
+                    const t = e.touches?.[0];
+                    if (t) touchStartRef.current = { x: t.clientX, y: t.clientY };
+                  },
+                  onTouchEnd: (e) => {
+                    const s = touchStartRef.current;
+                    const t = e.changedTouches?.[0];
+                    touchStartRef.current = null;
+                    if (!s || !t) return;
+                    const dx = t.clientX - s.x;
+                    const dy = t.clientY - s.y;
+                    if (Math.abs(dy) > 30) return; // 垂直滑动忽略
+                    if (dx < -24) {
+                      setSwipedRowId(record.id);
+                    } else if (dx > 24) {
+                      setSwipedRowId(null);
+                    }
+                  },
+                }
+              : ({} as any)
+          }
           pagination={{
             ...pagination,
             showSizeChanger: true,
