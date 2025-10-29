@@ -526,6 +526,11 @@ const ResourceList: React.FC = () => {
       title: '姓名',
       dataIndex: 'name',
       key: 'name',
+      filters: !isMobile ? data
+        .filter(item => item.name) // 过滤掉 name 为空的项
+        .map((item) => ({ text: item.name!, value: item.name! })) : undefined,
+      filterSearch: !isMobile,
+      onFilter: (filterValue: React.Key | boolean, record: Resource) => !isMobile && String(record.name).includes(String(filterValue)),
       render: (text: string) => <span style={{ fontWeight: 600 }}>{text}</span>,
     },
     {
