@@ -6,6 +6,13 @@
 /* 消除 Ant Layout 默认白底，避免顶栏下方看到白边 */
 .layout-wrapper .ant-layout { background: transparent; }
 
+/* 顶栏下的主布局容器：固定视口高度，隐藏外层滚动 */
+.layout-shell {
+  height: calc(100vh - 56px);
+  overflow: hidden;
+}
+.layout-shell .ant-layout { height: 100%; }
+
 /* 侧栏头部区域 */
 .sider-header {
   display: flex;
@@ -28,6 +35,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  overflow: auto; /* 仅主内容区滚动 */
   background: var(--bg-app);
 }
 .content-body {
