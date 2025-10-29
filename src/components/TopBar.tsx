@@ -6,10 +6,10 @@ import './TopBar.css';
 type Props = {
   onToggleMenu?: () => void;
   onToggleInput?: () => void;
-  isHome?: boolean;
+  showInput?: boolean;
 };
 
-const TopBar: React.FC<Props> = ({ onToggleMenu, onToggleInput, isHome }) => {
+const TopBar: React.FC<Props> = ({ onToggleMenu, onToggleInput, showInput }) => {
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
 
@@ -28,7 +28,7 @@ const TopBar: React.FC<Props> = ({ onToggleMenu, onToggleInput, isHome }) => {
       </div>
 
       <div className="topbar-right">
-        {isHome && (
+        {showInput && (
           <button className="icon-btn" onClick={onToggleInput} aria-label="打开/收起输入">
             <RobotOutlined />
           </button>

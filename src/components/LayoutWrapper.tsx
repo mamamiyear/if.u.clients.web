@@ -14,6 +14,7 @@ const LayoutWrapper: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [inputOpen, setInputOpen] = React.useState(false);
   const isHome = location.pathname === '/';
+  const isList = location.pathname === '/resources';
   const layoutShellRef = React.useRef<HTMLDivElement>(null);
 
   const pathToKey = (path: string) => {
@@ -53,8 +54,8 @@ const LayoutWrapper: React.FC = () => {
       {/* 顶部标题栏，位于左侧菜单栏之上 */}
       <TopBar
         onToggleMenu={() => {setInputOpen(false); setMobileMenuOpen((v) => !v);}}
-        onToggleInput={() => {if (isHome) {setMobileMenuOpen(false); setInputOpen((v) => !v);}}}
-        isHome={isHome}
+        onToggleInput={() => {if (isHome || isList) {setMobileMenuOpen(false); setInputOpen((v) => !v);}}}
+        showInput={isHome || isList}
       />
       {/* 下方为主布局：左侧菜单 + 右侧内容 */}
       <Layout ref={layoutShellRef as any}>
@@ -76,7 +77,16 @@ const LayoutWrapper: React.FC = () => {
                 />
               }
             />
-            <Route path="/resources" element={<ResourceList />} />
+            <Route
+              path="/resources"
+              element={
+                <ResourceList
+                  inputOpen={inputOpen}
+                  onCloseInput={() => setInputOpen(false)}
+                  containerEl={layoutShellRef.current}
+                />
+              }
+            />
             <Route path="/menu2" element={<div style={{ padding: 32, color: '#cbd5e1' }}>菜单2的内容暂未实现</div>} />
           </Routes>
         </Layout>

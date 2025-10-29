@@ -5,6 +5,7 @@ import type { FilterDropdownProps } from 'antd/es/table/interface';
 import type { TableProps } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import './MainContent.css';
+import InputDrawer from './InputDrawer.tsx';
 import { getPeoples } from '../apis';
 import type { People } from '../apis';
 
@@ -13,6 +14,20 @@ const { Content } = Layout;
 // 数据类型定义 - 使用 API 中的 People 类型
 export type DictValue = Record<string, string>;
 export type Resource = People;
+
+// 统一转换 API 返回的人员列表为表格需要的结构
+function transformPeoples(list: People[] = []): Resource[] {
+  return (list || []).map((person: any) => ({
+    id: person.id || `person-${Date.now()}-${Math.random()}`,
+    name: person.name || '未知',
+    gender: person.gender || '其他/保密',
+    age: person.age || 0,
+    height: person.height,
+    marital_status: person.marital_status,
+    introduction: person.introduction || {},
+    contact: person.contact || '',
+  }));
+}
 
 // 获取人员列表数据
 async function fetchResources(): Promise<Resource[]> {
@@ -31,16 +46,7 @@ async function fetchResources(): Promise<Resource[]> {
     }
     
     // 转换数据格式以匹配组件期望的结构
-    return response.data?.map((person: any) => ({
-      id: person.id || `person-${Date.now()}-${Math.random()}`,
-      name: person.name || '未知',
-      gender: person.gender || '其他/保密',
-      age: person.age || 0,
-      height: person.height,
-      marital_status: person.marital_status,
-      introduction: person.introduction || {},
-      contact: person.contact || '',
-    })) || [];
+    return transformPeoples(response.data || []);
     
   } catch (error: any) {
     console.error('获取人员列表失败:', error);
@@ -497,12 +503,15 @@ function buildNumberRangeFilter(dataIndex: keyof Resource, label: string): Colum
   } as ColumnType<Resource>;
 }
 
-const ResourceList: React.FC = () => {
+type Props = { inputOpen?: boolean; onCloseInput?: () => void; containerEl?: HTMLElement | null };
+
+const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, containerEl }) => {
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
   const [loading, setLoading] = React.useState(false);
   const [data, setData] = React.useState<Resource[]>([]);
   const [pagination, setPagination] = React.useState<{ current: number; pageSize: number }>({ current: 1, pageSize: 10 });
+  const [inputResult, setInputResult] = React.useState<any>(null);
 
   const handleTableChange: TableProps<Resource>['onChange'] = (pg) => {
     setPagination({ current: pg?.current ?? 1, pageSize: pg?.pageSize ?? 10 });
@@ -633,6 +642,21 @@ const ResourceList: React.FC = () => {
           }}
         />
       </div>
+      {/* 列表页右侧输入抽屉，挂载到标题栏下方容器 */}
+      <InputDrawer
+        open={inputOpen}
+        onClose={onCloseInput || (() => {})}
+        onResult={(list: any) => {
+          setInputResult(list);
+          const mapped = transformPeoples(Array.isArray(list) ? list : []);
+          setData(mapped);
+          // 回到第一页，保证用户看到最新结果
+          setPagination((pg) => ({ current: 1, pageSize: pg.pageSize }));
+        }}
+        containerEl={containerEl}
+        showUpload={false}
+        mode={'search'}
+      />
     </Content>
   );
 };
