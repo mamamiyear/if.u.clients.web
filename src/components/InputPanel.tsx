@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, Upload, message, Button, Spin } from 'antd';
+import { Input, Upload, message, Button, Spin, Tag } from 'antd';
 import { PictureOutlined, SendOutlined, LoadingOutlined, SearchOutlined } from '@ant-design/icons';
 import { postInput, postInputImage, getPeoples } from '../apis';
 import './InputPanel.css';
@@ -16,6 +16,7 @@ const InputPanel: React.FC<InputPanelProps> = ({ onResult, showUpload = true, mo
   const [value, setValue] = React.useState('');
   const [fileList, setFileList] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(false);
+  const [savedText, setSavedText] = React.useState<string>('');
 
   // 统一显示短文件名：image.{ext}
   const getImageExt = (file: any): string => {
@@ -95,6 +96,7 @@ const InputPanel: React.FC<InputPanelProps> = ({ onResult, showUpload = true, mo
         // 清空输入
         setValue('');
         setFileList([]);
+        setSavedText('');
       } else {
         message.error(response.error_info || '处理失败，请重试');
       }
@@ -154,6 +156,10 @@ const InputPanel: React.FC<InputPanelProps> = ({ onResult, showUpload = true, mo
       } as any;
 
       // 仅保留一张：新图直接替换旧图
+      if (fileList.length === 0) {
+        setSavedText(value);
+      }
+      setValue('');
       setFileList([entry]);
       message.success('已添加剪贴板图片');
     }
@@ -166,39 +172,63 @@ const InputPanel: React.FC<InputPanelProps> = ({ onResult, showUpload = true, mo
         tip="正在处理中，请稍候..."
         indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />}
       >
+        {/** 根据禁用状态动态占位符文案 */}
+        {(() => {
+          return null;
+        })()}
         <TextArea
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          placeholder={showUpload ? '请输入个人信息描述，或上传图片…' : '请输入个人信息描述…'}
+          placeholder={
+            showUpload && fileList.length > 0
+              ? '不可在添加图片时输入信息...'
+              : (showUpload ? '请输入个人信息描述，或上传图片…' : '请输入个人信息描述…')
+          }
           autoSize={{ minRows: 6, maxRows: 12 }}
-          style={{ fontSize: 14 }}
+          style={{ fontSize: 16 }}
           onKeyDown={onKeyDown}
           onPaste={onPaste}
-          disabled={loading}
+          disabled={loading || (showUpload && fileList.length > 0)}
         />
       </Spin>
       <div className="input-actions">
+        {/* 左侧文件标签显示 */}
+        {showUpload && fileList.length > 0 && (
+          <Tag
+            className="selected-image-tag"
+            color="processing"
+            closable
+            onClose={() => { setFileList([]); setValue(savedText); setSavedText(''); }}
+            bordered={false}
+          >
+            {`image.${new Date().getSeconds()}.${getImageExt(fileList[0]?.originFileObj || fileList[0])}`}
+          </Tag>
+        )}
         {showUpload && (
           <Upload
             accept="image/*"
             multiple={false}
             beforeUpload={() => false}
             fileList={fileList}
-            onChange={({ file, fileList }) => {
+            onChange={({ file, fileList: nextFileList }) => {
               // 只保留最新一个，并重命名为 image.{ext}
-              if (fileList.length === 0) {
+              if (nextFileList.length === 0) {
                 setFileList([]);
                 return;
               }
-              const latest = fileList[fileList.length - 1] as any;
+              const latest = nextFileList[nextFileList.length - 1] as any;
               const raw = latest.originFileObj || file; // UploadFile 或原始 File
               const ext = getImageExt(raw);
               const renamed = { ...latest, name: `image.${ext}` };
+              if (fileList.length === 0) {
+                setSavedText(value);
+              }
+              setValue('');
               setFileList([renamed]);
             }}
-            onRemove={() => { setFileList([]); return true; }}
+            onRemove={() => { setFileList([]); setValue(savedText); setSavedText(''); return true; }}
             maxCount={1}
-            showUploadList={{ showPreviewIcon: false, showRemoveIcon: true }}
+            showUploadList={false}
             disabled={loading}
           >
             <Button type="text" icon={<PictureOutlined />} disabled={loading} />
