@@ -3,9 +3,10 @@ import { Layout, Typography, Table, Grid, InputNumber, Button, Space, Tag, messa
 import type { ColumnsType, ColumnType } from 'antd/es/table';
 import type { FilterDropdownProps } from 'antd/es/table/interface';
 import type { TableProps } from 'antd';
-import { SearchOutlined, EllipsisOutlined, DeleteOutlined, ManOutlined, WomanOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { SearchOutlined, EllipsisOutlined, DeleteOutlined, ManOutlined, WomanOutlined, ExclamationCircleOutlined, PictureOutlined } from '@ant-design/icons';
 import './MainContent.css';
 import InputDrawer from './InputDrawer.tsx';
+import ImageModal from './ImageModal.tsx';
 import { getPeoples } from '../apis';
 import type { People } from '../apis';
 import { deletePeople } from '../apis/people';
@@ -28,6 +29,7 @@ function transformPeoples(list: People[] = []): Resource[] {
     marital_status: person.marital_status,
     introduction: person.introduction || {},
     contact: person.contact || '',
+    cover: person.cover || '',
   }));
 }
 
@@ -516,6 +518,10 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
   // const [inputResult, setInputResult] = React.useState<any>(null);
   const [swipedRowId, setSwipedRowId] = React.useState<string | null>(null);
   const touchStartRef = React.useRef<{ x: number; y: number } | null>(null);
+  
+  // 图片弹窗状态
+  const [imageModalVisible, setImageModalVisible] = React.useState(false);
+  const [currentImageUrl, setCurrentImageUrl] = React.useState('');
 
   const handleTableChange: TableProps<Resource>['onChange'] = (pg) => {
     setPagination({ current: pg?.current ?? 1, pageSize: pg?.pageSize ?? 10 });
@@ -589,17 +595,44 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
       },
       onFilter: (filterValue: React.Key | boolean, record: Resource) => String(record.name).includes(String(filterValue)),
       render: (text: string, record: Resource) => {
-        if (!isMobile) return <span style={{ fontWeight: 600 }}>{text}</span>;
+        // 图片图标逻辑
+        const hasCover = record.cover && record.cover.trim() !== '';
+        const pictureIcon = (
+          <PictureOutlined 
+            style={{ 
+              color: hasCover ? '#1677ff' : '#9ca3af',
+              cursor: hasCover ? 'pointer' : 'default'
+            }}
+            onClick={hasCover ? () => {
+              setCurrentImageUrl(record.cover);
+              setImageModalVisible(true);
+            } : undefined}
+          />
+        );
+
+        if (!isMobile) {
+          // 桌面端：姓名后面跟图片图标
+          return (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ fontWeight: 600 }}>{text}</span>
+              {pictureIcon}
+            </span>
+          );
+        }
+
+        // 移动端：姓名 + 性别图标 + 图片图标
         const g = record.gender;
-        const icon = g === '男'
+        const genderIcon = g === '男'
           ? <ManOutlined style={{ color: '#1677ff' }} />
           : g === '女'
             ? <WomanOutlined style={{ color: '#eb2f96' }} />
             : <ExclamationCircleOutlined style={{ color: '#9ca3af' }} />;
+        
         return (
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             <span style={{ fontWeight: 600 }}>{text}</span>
-            {icon}
+            {genderIcon}
+            {pictureIcon}
           </span>
         );
       },
@@ -819,6 +852,16 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
         containerEl={containerEl}
         showUpload={false}
         mode={'search'}
+      />
+      
+      {/* 图片预览弹窗 */}
+      <ImageModal
+        visible={imageModalVisible}
+        imageUrl={currentImageUrl}
+        onClose={() => {
+          setImageModalVisible(false);
+          setCurrentImageUrl('');
+        }}
       />
     </Content>
   );
