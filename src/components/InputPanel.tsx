@@ -107,6 +107,49 @@ const InputPanel: React.FC<InputPanelProps> = ({ onResult, showUpload = true, mo
     }
   };
 
+  // 处理剪贴板粘贴图片：将图片加入上传列表，复用现有上传流程
+  const onPaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    if (!showUpload || loading) return;
+
+    const items = e.clipboardData?.items;
+    if (!items || items.length === 0) return;
+
+    const pastedImages: File[] = [];
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.kind === 'file') {
+        const file = item.getAsFile();
+        if (file && file.type.startsWith('image/')) {
+          pastedImages.push(file);
+        }
+      }
+    }
+
+    if (pastedImages.length > 0) {
+      // 避免将图片以奇怪文本形式粘贴进输入框
+      e.preventDefault();
+
+      const newList = pastedImages.map((file, idx) => {
+        const ext = (file.type.split('/')[1] || 'png').toLowerCase();
+        const name = file.name && file.name.trim().length > 0 ? file.name : `pasted-image-${Date.now()}-${idx}.${ext}`;
+        return {
+          uid: `${Date.now()}-${Math.random()}-${idx}`,
+          name,
+          status: 'done',
+          originFileObj: file,
+        } as any;
+      });
+
+      // 受控更新并遵守最大数量限制
+      setFileList((prev) => {
+        const merged = [...prev, ...newList];
+        return merged.slice(0, 9);
+      });
+
+      message.success(`已添加${pastedImages.length}张剪贴板图片`);
+    }
+  };
+
   return (
     <div className="input-panel">
       <Spin 
@@ -121,6 +164,7 @@ const InputPanel: React.FC<InputPanelProps> = ({ onResult, showUpload = true, mo
           autoSize={{ minRows: 6, maxRows: 12 }}
           style={{ fontSize: 14 }}
           onKeyDown={onKeyDown}
+          onPaste={onPaste}
           disabled={loading}
         />
       </Spin>
