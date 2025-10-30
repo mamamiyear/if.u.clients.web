@@ -45,12 +45,13 @@ export interface GetPeoplesParams {
 export interface People {
   id?: string;
   name?: string;
+  contact?: string;
   gender?: string;
   age?: number;
   height?: number;
   marital_status?: string;
-  contact?: string;
   [key: string]: any;
+  cover?: string;
 }
 
 // 分页响应类型

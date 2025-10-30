@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Form, Input, Select, InputNumber, Button, message, Row, Col } from 'antd';
 import './PeopleForm.css';
 import KeyValueList from './KeyValueList.tsx'
-import { createPeople } from '../apis';
+import { createPeople, type People } from '../apis';
 
 const { TextArea } = Input;
 
@@ -24,6 +24,7 @@ const PeopleForm: React.FC<PeopleFormProps> = ({ initialData }) => {
       
       if (initialData.name) formData.name = initialData.name;
       if (initialData.contact) formData.contact = initialData.contact;
+      if (initialData.cover) formData.cover = initialData.cover;
       if (initialData.gender) formData.gender = initialData.gender;
       if (initialData.age) formData.age = initialData.age;
       if (initialData.height) formData.height = initialData.height;
@@ -43,15 +44,16 @@ const PeopleForm: React.FC<PeopleFormProps> = ({ initialData }) => {
     setLoading(true);
     
     try {
-      const peopleData = {
+      const peopleData: People = {
         name: values.name,
+        contact: values.contact || undefined,
         gender: values.gender,
         age: values.age,
         height: values.height || undefined,
         marital_status: values.marital_status || undefined,
         introduction: values.introduction || {},
         match_requirement: values.match_requirement || undefined,
-        contact: values.contact || undefined,
+        cover: values.cover || undefined,
       };
 
       console.log('提交人员数据:', peopleData);
@@ -101,6 +103,14 @@ const PeopleForm: React.FC<PeopleFormProps> = ({ initialData }) => {
           <Col xs={24} md={12}>
             <Form.Item name="contact" label="联系人">
               <Input placeholder="如：李四（可留空）" />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Row gutter={[12, 12]}>
+          <Col xs={24}>
+            <Form.Item name="cover" label="人物封面">
+              <Input placeholder="请输入图片链接（可留空）" />
             </Form.Item>
           </Col>
         </Row>

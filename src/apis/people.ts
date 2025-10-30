@@ -15,7 +15,7 @@ import type {
  * @param people 人员信息对象
  * @returns Promise<ApiResponse>
  */
-export async function createPeople(people: Record<string, any>): Promise<ApiResponse> {
+export async function createPeople(people: People): Promise<ApiResponse> {
   const requestData: PostPeopleRequest = { people };
   console.log('创建人员请求数据:', requestData);
   return post<ApiResponse>(API_ENDPOINTS.PEOPLES, requestData);
@@ -115,7 +115,7 @@ export async function deletePeople(peopleId: string): Promise<ApiResponse> {
  * @returns Promise<ApiResponse[]>
  */
 export async function createPeoplesBatch(
-  peopleList: Record<string, any>[]
+  peopleList: People[]
 ): Promise<ApiResponse[]> {
   const promises = peopleList.map(people => createPeople(people));
   return Promise.all(promises);
