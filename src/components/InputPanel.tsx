@@ -17,6 +17,19 @@ const InputPanel: React.FC<InputPanelProps> = ({ onResult, showUpload = true, mo
   const [fileList, setFileList] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(false);
 
+  // 统一显示短文件名：image.{ext}
+  const getImageExt = (file: any): string => {
+    const type = file?.type || '';
+    if (typeof type === 'string' && type.startsWith('image/')) {
+      const sub = type.split('/')[1] || 'png';
+      return sub.toLowerCase();
+    }
+    const name = file?.name || '';
+    const dot = name.lastIndexOf('.');
+    const ext = dot >= 0 ? name.slice(dot + 1) : '';
+    return (ext || 'png').toLowerCase();
+  };
+
   const send = async () => {
     const trimmed = value.trim();
     const hasText = trimmed.length > 0;
@@ -114,39 +127,35 @@ const InputPanel: React.FC<InputPanelProps> = ({ onResult, showUpload = true, mo
     const items = e.clipboardData?.items;
     if (!items || items.length === 0) return;
 
-    const pastedImages: File[] = [];
+    let pastedImage: File | null = null;
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
       if (item.kind === 'file') {
         const file = item.getAsFile();
         if (file && file.type.startsWith('image/')) {
-          pastedImages.push(file);
+          pastedImage = file;
+          break; // 只取第一张
         }
       }
     }
 
-    if (pastedImages.length > 0) {
-      // 避免将图片以奇怪文本形式粘贴进输入框
+    if (pastedImage) {
+      // 避免图片内容以文本方式粘贴进输入框
       e.preventDefault();
 
-      const newList = pastedImages.map((file, idx) => {
-        const ext = (file.type.split('/')[1] || 'png').toLowerCase();
-        const name = file.name && file.name.trim().length > 0 ? file.name : `pasted-image-${Date.now()}-${idx}.${ext}`;
-        return {
-          uid: `${Date.now()}-${Math.random()}-${idx}`,
-          name,
-          status: 'done',
-          originFileObj: file,
-        } as any;
-      });
+      const ext = getImageExt(pastedImage);
+      const name = `image.${ext}`;
 
-      // 受控更新并遵守最大数量限制
-      setFileList((prev) => {
-        const merged = [...prev, ...newList];
-        return merged.slice(0, 9);
-      });
+      const entry = {
+        uid: `${Date.now()}-${Math.random()}`,
+        name,
+        status: 'done',
+        originFileObj: pastedImage,
+      } as any;
 
-      message.success(`已添加${pastedImages.length}张剪贴板图片`);
+      // 仅保留一张：新图直接替换旧图
+      setFileList([entry]);
+      message.success('已添加剪贴板图片');
     }
   };
 
@@ -172,11 +181,24 @@ const InputPanel: React.FC<InputPanelProps> = ({ onResult, showUpload = true, mo
         {showUpload && (
           <Upload
             accept="image/*"
+            multiple={false}
             beforeUpload={() => false}
             fileList={fileList}
-            onChange={({ fileList }) => setFileList(fileList as any)}
-            maxCount={9}
-            showUploadList={{ showPreviewIcon: false }}
+            onChange={({ file, fileList }) => {
+              // 只保留最新一个，并重命名为 image.{ext}
+              if (fileList.length === 0) {
+                setFileList([]);
+                return;
+              }
+              const latest = fileList[fileList.length - 1] as any;
+              const raw = latest.originFileObj || file; // UploadFile 或原始 File
+              const ext = getImageExt(raw);
+              const renamed = { ...latest, name: `image.${ext}` };
+              setFileList([renamed]);
+            }}
+            onRemove={() => { setFileList([]); return true; }}
+            maxCount={1}
+            showUploadList={{ showPreviewIcon: false, showRemoveIcon: true }}
             disabled={loading}
           >
             <Button type="text" icon={<PictureOutlined />} disabled={loading} />
