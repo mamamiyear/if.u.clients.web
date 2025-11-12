@@ -91,6 +91,7 @@ import {
   getPeoples, 
   searchPeoples, 
   deletePeople,
+  updatePeople,
   getPeoplesPaginated 
 } from '@/apis';
 
@@ -152,6 +153,20 @@ const removePeople = async (peopleId: string) => {
     console.log('删除成功:', response);
   } catch (error) {
     console.error('删除失败:', error);
+  }
+};
+
+// 更新人员
+const updateOnePeople = async (peopleId: string) => {
+  const peopleData = {
+    name: '李四',
+    age: 28,
+  };
+  try {
+    const response = await updatePeople(peopleId, peopleData);
+    console.log('更新成功:', response);
+  } catch (error) {
+    console.error('更新失败:', error);
   }
 };
 ```

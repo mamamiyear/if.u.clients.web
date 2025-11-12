@@ -34,7 +34,8 @@ export async function postInputImageWithProgress(
   }
 
   const formData = new FormData();
-  formData.append('file', file);
+  // 后端要求字段名为 image
+  formData.append('image', file);
 
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();

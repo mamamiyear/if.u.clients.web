@@ -1,6 +1,6 @@
 // 人员管理相关 API
 
-import { get, post, del } from './request';
+import { get, post, del, put } from './request';
 import { API_ENDPOINTS } from './config';
 import type { 
   PostPeopleRequest, 
@@ -18,7 +18,8 @@ import type {
 export async function createPeople(people: People): Promise<ApiResponse> {
   const requestData: PostPeopleRequest = { people };
   console.log('创建人员请求数据:', requestData);
-  return post<ApiResponse>(API_ENDPOINTS.PEOPLES, requestData);
+  // 创建接口改为 /people
+  return post<ApiResponse>(API_ENDPOINTS.PEOPLE, requestData);
 }
 
 /**
@@ -107,6 +108,17 @@ export async function getPeoplesPaginated(
  */
 export async function deletePeople(peopleId: string): Promise<ApiResponse> {
   return del<ApiResponse>(API_ENDPOINTS.PEOPLE_BY_ID(peopleId));
+}
+
+/**
+ * 更新人员信息
+ * @param peopleId 人员ID
+ * @param people 人员信息对象
+ * @returns Promise<ApiResponse>
+ */
+export async function updatePeople(peopleId: string, people: People): Promise<ApiResponse> {
+  const requestData: PostPeopleRequest = { people };
+  return put<ApiResponse>(API_ENDPOINTS.PEOPLE_BY_ID(peopleId), requestData);
 }
 
 /**

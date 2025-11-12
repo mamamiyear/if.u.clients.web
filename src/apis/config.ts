@@ -10,8 +10,11 @@ export const API_CONFIG = {
 
 // API 端点
 export const API_ENDPOINTS = {
-  INPUT: '/input',
-  INPUT_IMAGE: '/input_image',
+  INPUT: '/recognition/input',
+  INPUT_IMAGE: '/recognition/image',
+  // 人员列表查询仍为 /peoples
   PEOPLES: '/peoples',
-  PEOPLE_BY_ID: (id: string) => `/peoples/${id}`,
+  // 新增单个资源路径 /people
+  PEOPLE: '/people',
+  PEOPLE_BY_ID: (id: string) => `/people/${id}`,
 } as const;
