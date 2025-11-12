@@ -125,10 +125,12 @@ const ImageModal: React.FC<ImageModalProps> = ({ visible, imageUrl, onClose }) =
       closable={false}
       width={isMobile ? '100vw' : '66vw'}
       style={modalStyle}
-      bodyStyle={modalBodyStyle}
+      styles={{
+        body: modalBodyStyle,
+        mask: { backgroundColor: 'rgba(0, 0, 0, 0.8)' },
+      }}
       centered={true} // 移动端和PC端都居中显示
-      destroyOnClose
-      maskStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.8)' }}
+      destroyOnHidden
       wrapClassName={isMobile ? 'mobile-image-modal' : 'desktop-image-modal'}
     >
       {/* 自定义关闭按钮 */}

@@ -1063,7 +1063,7 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
               }
             }
           }}
-          destroyOnClose
+          destroyOnHidden
           okText="确认"
           cancelText="取消"
         >
