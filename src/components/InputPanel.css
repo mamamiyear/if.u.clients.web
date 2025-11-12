@@ -1,0 +1,56 @@
+/* 输入面板组件样式 */
+.input-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* 增大间距 */
+}
+
+.input-panel .ant-input-outlined,
+.input-panel .ant-input {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  min-height: 180px; /* 提升基础高度，配合 autoSize 更宽裕 */
+}
+
+.input-panel .ant-input::placeholder { color: var(--placeholder); }
+.input-panel .ant-input:focus,
+.input-panel .ant-input-focused {
+  border-color: var(--color-primary-600);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+/* 禁用态：浅灰背景与文字，明确不可编辑 */
+.input-panel .ant-input[disabled],
+.input-panel .ant-input-disabled,
+.input-panel .ant-input-outlined.ant-input-disabled {
+  background: #f3f4f6; /* gray-100 */
+  color: #9ca3af;      /* gray-400 */
+  border-color: #e5e7eb; /* gray-200 */
+  cursor: not-allowed;
+  -webkit-text-fill-color: #9ca3af; /* Safari 禁用态颜色 */
+}
+.input-panel .ant-input[disabled]::placeholder {
+  color: #cbd5e1; /* gray-300 */
+}
+
+.input-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.input-actions .ant-btn-text { color: var(--text-secondary); }
+.input-actions .ant-btn-text:hover { color: var(--color-primary-600); }
+
+/* 左侧文件标签样式，保持短名及紧凑展示 */
+.selected-image-tag {
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: auto; /* 保持标签在左侧，按钮在右侧 */
+}
+
+/* 移除右侧容器样式，按钮直接在 input-actions 中对齐 */

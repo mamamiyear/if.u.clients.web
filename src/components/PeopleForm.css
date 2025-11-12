@@ -1,0 +1,40 @@
+/* 人物信息录入表单样式 */
+.people-form {
+  margin-top: 16px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.people-form .ant-form-item-label > label {
+  color: var(--text-secondary);
+}
+
+.people-form .ant-input,
+.people-form .ant-input-affix-wrapper,
+.people-form .ant-select-selector,
+.people-form .ant-input-number,
+.people-form .ant-input-number-input {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.people-form .ant-select-selection-item,
+.people-form .ant-select-selection-placeholder {
+  color: var(--placeholder);
+}
+.people-form .ant-select-selection-item { color: var(--text-primary); }
+
+/* 输入占位与聚焦态 */
+.people-form .ant-input::placeholder { color: var(--placeholder); }
+.people-form .ant-input-number-input::placeholder { color: var(--placeholder); }
+.people-form .ant-input:focus,
+.people-form .ant-input-affix-wrapper-focused,
+.people-form .ant-select-focused .ant-select-selector,
+.people-form .ant-input-number-focused {
+  border-color: var(--color-primary-600) !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}

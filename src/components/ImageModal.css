@@ -1,0 +1,65 @@
+/* PC端图片弹窗样式 */
+.desktop-image-modal .ant-modal-wrap {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.desktop-image-modal .ant-modal {
+  top: auto !important;
+  left: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+  padding-bottom: 0 !important;
+  position: relative !important;
+}
+
+.desktop-image-modal .ant-modal-content {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* 移动端图片弹窗样式 */
+.mobile-image-modal .ant-modal-wrap {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 64px 0 0 0 !important; /* 顶部留出标题栏空间 */
+}
+
+.mobile-image-modal .ant-modal {
+  top: auto !important;
+  left: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+  padding-bottom: 0 !important;
+  position: relative !important;
+  width: 100vw !important;
+}
+
+.mobile-image-modal .ant-modal-content {
+  border-radius: 0;
+  width: 100% !important;
+  max-height: calc(100vh - 64px);
+}
+
+.mobile-image-modal .ant-modal-body {
+  padding: 0 !important;
+}
+
+/* 确保图片容器不会溢出 */
+.image-modal-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.image-modal-container img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+}

@@ -1,0 +1,78 @@
+/* 全局基础样式 */
+:root {
+  /* Minty Spring 主题变量 */
+  --color-primary: #A7F3D0; /* 薄荷绿 */
+  --color-primary-600: #10B981; /* 深薄荷绿，用于文本/边框强调 */
+  --color-accent: #F97A7A; /* 珊瑚红（CTA） */
+  --bg-app: #F9F9F9; /* 主内容背景 */
+  --bg-sider: #262626; /* 侧栏与深色顶栏 */
+  --bg-card: #FFFFFF; /* 卡片与输入框背景 */
+  --text-primary: #334155; /* 深石板灰 */
+  --text-secondary: #475569; /* 次要文本 */
+  --text-invert: #E5E7EB; /* 深背景上的浅文本 */
+  --border: #E2E8F0; /* 通用边框 */
+  --muted: #94A3B8; /* 提示文字 */
+  --placeholder: hsla(215, 12%, 35%, 0.15); /* 更淡的占位符 */
+  --focus: #A7F3D0; /* 聚焦外光圈 */
+  --mask: rgba(17, 24, 39, 0.35); /* 遮罩 */
+}
+@supports (font-variation-settings: normal) {
+  :root { font-synthesis-weight: none; }
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  /* 保留暗色基底，但主内容将使用浅色背景 */
+  background: radial-gradient(1200px 600px at 70% -100px, rgba(92,124,255,0.25) 0%, rgba(92,124,255,0.06) 45%, transparent 60%),
+              radial-gradient(800px 400px at -200px 20%, rgba(120,220,255,0.15) 0%, rgba(120,220,255,0.06) 50%, transparent 70%),
+              #0f172a; /* slate-900 */
+  color: var(--text-invert);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 让 Ant Design 的 Layout 充满视口 */
+.app-root {
+  min-height: 100vh;
+}
+
+/* 统一滚动条样式（轻度） */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.2) transparent;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.2);
+  border-radius: 6px;
+}
+
+/* 全局主按钮样式（Ant Design） */
+.ant-btn-primary {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+.ant-btn-primary:hover,
+.ant-btn-primary:focus {
+  background: #F06363;
+  border-color: #F06363;
+}
+.ant-btn-primary:disabled {
+  background: #FBC2C2;
+  border-color: #FBC2C2;
+  color: rgba(255,255,255,0.7);
+}
+
+/* 全局更淡的占位符颜色 */
+.ant-input::placeholder,
+.ant-input-affix-wrapper input::placeholder,
+.ant-input-number-input::placeholder,
+textarea::placeholder {
+  color: var(--placeholder) !important;
+}

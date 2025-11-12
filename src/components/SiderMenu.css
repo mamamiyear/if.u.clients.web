@@ -1,0 +1,55 @@
+/* 侧边菜单组件局部样式 */
+.sider-header { border-bottom: 1px solid rgba(255,255,255,0.08); color: var(--text-invert); }
+
+/* 收起时图标水平居中（仅 PC 端 Sider 使用） */
+.sider-header.collapsed { justify-content: center; }
+
+/* 移动端汉堡触发按钮位置 */
+.mobile-menu-trigger {
+  position: fixed;
+  left: 16px;
+  top: 16px;
+  z-index: 1100;
+}
+
+/* 移动端 Drawer 背景与滚动 */
+.mobile-menu-drawer .ant-drawer-body {
+  background: linear-gradient(180deg, rgba(16,185,129,0.12) 0%, rgba(16,185,129,0.22) 100%), var(--bg-sider);
+  padding: 0;
+  height: 100%;
+}
+
+/* Dark 菜单项：选中与悬停采用薄荷主色的柔和高亮 */
+.ant-menu-dark .ant-menu-item-selected {
+  background-color: rgba(167, 243, 208, 0.16) !important;
+  color: var(--text-invert) !important;
+}
+.ant-menu-dark .ant-menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* 移动端菜单背景透明以露出侧栏渐变 */
+.mobile-menu-drawer .ant-menu { background: transparent !important; }
+
+/* 统一 Sider 背景为薄荷风格的深色渐变 */
+.ant-layout-sider {
+  background: linear-gradient(180deg, rgba(16,185,129,0.12) 0%, rgba(16,185,129,0.22) 100%), var(--bg-sider) !important;
+}
+.ant-layout-sider .ant-menu { background: transparent !important; }
+
+/* Sider 触发按钮（折叠/展开）样式 */
+.ant-layout-sider-trigger {
+  background: linear-gradient(180deg, rgba(16,185,129,0.18) 0%, rgba(16,185,129,0.28) 100%) !important;
+  color: var(--text-invert) !important;
+  border-top: 1px solid rgba(167, 243, 208, 0.25);
+}
+
+/* 移动端汉堡按钮风格 */
+.mobile-menu-trigger {
+  border: 1px solid rgba(255,255,255,0.16);
+  background: linear-gradient(180deg, rgba(16,185,129,0.12) 0%, rgba(16,185,129,0.24) 100%);
+  color: var(--text-invert);
+}
+.mobile-menu-trigger:hover {
+  background: rgba(16,185,129,0.35);
+}

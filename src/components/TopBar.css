@@ -1,0 +1,46 @@
+/* 顶部网站标题栏样式 */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 2000; /* 保证位于抽屉与遮罩之上 */
+  height: 56px;
+  display: grid;
+  grid-template-columns: 56px 1fr 56px;
+  align-items: center;
+  background: linear-gradient(180deg, rgba(6, 78, 59, 0.55) 0%, rgba(6, 78, 59, 0.88) 100%);
+  border-bottom: 1px solid rgba(167, 243, 208, 0.25);
+  backdrop-filter: blur(4px);
+}
+
+.topbar-title {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  font-style: italic;
+  letter-spacing: 1px;
+  color: var(--text-invert);
+}
+
+.topbar-left,
+.topbar-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: linear-gradient(180deg, rgba(16,185,129,0.15) 0%, rgba(16,185,129,0.25) 100%);
+  color: var(--color-primary-600);
+}
+.icon-btn:hover { background: rgba(16,185,129,0.35); }
+
+@media (min-width: 768px) {
+  .topbar { grid-template-columns: 56px 1fr 56px; }
+}
