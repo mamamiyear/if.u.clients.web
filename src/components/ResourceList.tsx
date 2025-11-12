@@ -1,15 +1,17 @@
 import React from 'react';
 import { Layout, Typography, Table, Grid, InputNumber, Button, Space, Tag, message, Modal, Dropdown, Input } from 'antd';
+import type { FormInstance } from 'antd';
 import type { ColumnsType, ColumnType } from 'antd/es/table';
 import type { FilterDropdownProps } from 'antd/es/table/interface';
 import type { TableProps } from 'antd';
-import { SearchOutlined, EllipsisOutlined, DeleteOutlined, ManOutlined, WomanOutlined, ExclamationCircleOutlined, PictureOutlined } from '@ant-design/icons';
+import { SearchOutlined, EllipsisOutlined, DeleteOutlined, ManOutlined, WomanOutlined, ExclamationCircleOutlined, PictureOutlined, EditOutlined } from '@ant-design/icons';
 import './MainContent.css';
 import InputDrawer from './InputDrawer.tsx';
 import ImageModal from './ImageModal.tsx';
+import PeopleForm from './PeopleForm.tsx';
 import { getPeoples } from '../apis';
 import type { People } from '../apis';
-import { deletePeople } from '../apis/people';
+import { deletePeople, updatePeople } from '../apis/people';
 
 const { Content } = Layout;
 
@@ -522,6 +524,13 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
   // 图片弹窗状态
   const [imageModalVisible, setImageModalVisible] = React.useState(false);
   const [currentImageUrl, setCurrentImageUrl] = React.useState('');
+  // 编辑弹窗状态（仅桌面端）
+  const [editModalVisible, setEditModalVisible] = React.useState(false);
+  const [editingRecord, setEditingRecord] = React.useState<Resource | null>(null);
+  const editFormRef = React.useRef<FormInstance | null>(null);
+
+  // 移动端编辑模式状态
+  const [mobileEditing, setMobileEditing] = React.useState(false);
 
   const handleTableChange: TableProps<Resource>['onChange'] = (pg) => {
     setPagination({ current: pg?.current ?? 1, pageSize: pg?.pageSize ?? 10 });
@@ -692,13 +701,55 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ flex: 1 }}>{v ? v : '-'}</span>
             {swipedRowId === record.id && (
-              <Button
-                type="primary"
-                danger
-                size="small"
-                icon={<DeleteOutlined />}
-                onClick={() => confirmDelete(record.id)}
-              />
+              <div style={{ display: 'inline-flex', gap: 8 }}>
+                <Button
+                  type="primary"
+                  size="small"
+                  icon={
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: 24,
+                        height: 24,
+                        borderRadius: 4,
+                        backgroundColor: '#1677ff',
+                        color: '#fff',
+                      }}
+                    >
+                      <EditOutlined style={{ fontSize: 12 }} />
+                    </span>
+                  }
+                  onClick={() => {
+                    setEditingRecord(record);
+                    setMobileEditing(true);
+                    setSwipedRowId(null);
+                  }}
+                />
+                <Button
+                  type="primary"
+                  danger
+                  size="small"
+                  icon={
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: 24,
+                        height: 24,
+                        borderRadius: 4,
+                        backgroundColor: '#f5222d',
+                        color: '#fff',
+                      }}
+                    >
+                      <DeleteOutlined style={{ fontSize: 12 }} />
+                    </span>
+                  }
+                  onClick={() => confirmDelete(record.id)}
+                />
+              </div>
             )}
           </div>
         );
@@ -715,6 +766,30 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
                   trigger={["click"]}
                   menu={{
                     items: [
+                      ...(!isMobile
+                        ? [
+                            {
+                              key: 'edit',
+                              label: '编辑',
+                              icon: (
+                                <span
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    width: 18,
+                                    height: 18,
+                                    borderRadius: 4,
+                                    backgroundColor: '#1677ff',
+                                    color: '#fff',
+                                  }}
+                                >
+                                  <EditOutlined style={{ fontSize: 12 }} />
+                                </span>
+                              ),
+                            },
+                          ]
+                        : []),
                       {
                         key: 'delete',
                         label: '删除',
@@ -738,6 +813,10 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
                     ],
                     onClick: ({ key }) => {
                       if (key === 'delete') confirmDelete(record.id);
+                      if (key === 'edit' && !isMobile) {
+                        setEditingRecord(record);
+                        setEditModalVisible(true);
+                      }
                     },
                   }}
                 >
@@ -755,11 +834,80 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
           资源列表
         </Typography.Title>
 
+        {isMobile && mobileEditing && (
+          <div>
+            <Typography.Title level={4} style={{ color: 'var(--text-primary)' }}>
+              编辑资源
+            </Typography.Title>
+            <PeopleForm
+              initialData={editingRecord || undefined}
+              hideSubmitButton
+              onFormReady={(f) => (editFormRef.current = f)}
+            />
+            <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
+              <Button
+                type="primary"
+                onClick={async () => {
+                  try {
+                    const form = editFormRef.current;
+                    if (!form) {
+                      message.error('表单未就绪');
+                      return;
+                    }
+                    const values = await form.validateFields();
+                    const peopleData: People = {
+                      name: values.name,
+                      contact: values.contact || undefined,
+                      gender: values.gender,
+                      age: values.age,
+                      height: values.height || undefined,
+                      marital_status: values.marital_status || undefined,
+                      introduction: values.introduction || {},
+                      match_requirement: values.match_requirement || undefined,
+                      cover: values.cover || undefined,
+                    };
+                    if (!editingRecord) {
+                      message.error('缺少当前编辑的人员信息');
+                      return;
+                    }
+                    const res = await updatePeople(editingRecord.id, peopleData);
+                    if (res.error_code === 0) {
+                      message.success('更新成功');
+                      setMobileEditing(false);
+                      setEditingRecord(null);
+                      await reloadResources();
+                    } else {
+                      message.error(res.error_info || '更新失败');
+                    }
+                  } catch (err: any) {
+                    if (err?.errorFields) {
+                      message.error('请完善表单后再保存');
+                    } else {
+                      message.error('更新失败');
+                    }
+                  }
+                }}
+              >
+                保存
+              </Button>
+              <Button
+                onClick={() => {
+                  setMobileEditing(false);
+                  setEditingRecord(null);
+                }}
+              >
+                取消
+              </Button>
+            </div>
+          </div>
+        )}
+
         <Table<Resource>
           rowKey="id"
           loading={loading}
           columns={columns}
           dataSource={data}
+          style={{ display: isMobile && mobileEditing ? 'none' : undefined }}
           onRow={(record) =>
             isMobile
               ? {
@@ -863,6 +1011,69 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
           setCurrentImageUrl('');
         }}
       />
+
+      {/* 编辑弹窗，仅桌面端显示 */}
+      {!isMobile && (
+        <Modal
+          open={editModalVisible}
+          title="编辑"
+          width="50%"
+          style={{ minWidth: 768 }}
+          onCancel={() => {
+            setEditModalVisible(false);
+            setEditingRecord(null);
+          }}
+          onOk={async () => {
+            try {
+              const form = editFormRef.current;
+              if (!form) {
+                message.error('表单未就绪');
+                return;
+              }
+              const values = await form.validateFields();
+              const peopleData: People = {
+                name: values.name,
+                contact: values.contact || undefined,
+                gender: values.gender,
+                age: values.age,
+                height: values.height || undefined,
+                marital_status: values.marital_status || undefined,
+                introduction: values.introduction || {},
+                match_requirement: values.match_requirement || undefined,
+                cover: values.cover || undefined,
+              };
+              if (!editingRecord) {
+                message.error('缺少当前编辑的人员信息');
+                return;
+              }
+              const res = await updatePeople(editingRecord.id, peopleData);
+              if (res.error_code === 0) {
+                message.success('更新成功');
+                setEditModalVisible(false);
+                setEditingRecord(null);
+                await reloadResources();
+              } else {
+                message.error(res.error_info || '更新失败');
+              }
+            } catch (err: any) {
+              if (err?.errorFields) {
+                message.error('请完善表单后再确认');
+              } else {
+                message.error('更新失败');
+              }
+            }
+          }}
+          destroyOnClose
+          okText="确认"
+          cancelText="取消"
+        >
+          <PeopleForm
+            initialData={editingRecord || undefined}
+            hideSubmitButton
+            onFormReady={(f) => (editFormRef.current = f)}
+          />
+        </Modal>
+      )}
     </Content>
   );
 };

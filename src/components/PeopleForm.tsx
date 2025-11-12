@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Input, Select, InputNumber, Button, message, Row, Col } from 'antd';
+import type { FormInstance } from 'antd';
 import './PeopleForm.css';
 import KeyValueList from './KeyValueList.tsx'
 import { createPeople, type People } from '../apis';
@@ -8,9 +9,13 @@ const { TextArea } = Input;
 
 interface PeopleFormProps {
   initialData?: any;
+  // 编辑模式下由父组件控制提交，隐藏内部提交按钮
+  hideSubmitButton?: boolean;
+  // 暴露 AntD Form 实例给父组件，用于在外部触发校验与取值
+  onFormReady?: (form: FormInstance) => void;
 }
 
-const PeopleForm: React.FC<PeopleFormProps> = ({ initialData }) => {
+const PeopleForm: React.FC<PeopleFormProps> = ({ initialData, hideSubmitButton = false, onFormReady }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
@@ -36,9 +41,16 @@ const PeopleForm: React.FC<PeopleFormProps> = ({ initialData }) => {
       form.setFieldsValue(formData);
       
       // 显示成功消息
-      message.success('已自动填充表单，请检查并确认信息');
+      // message.success('已自动填充表单，请检查并确认信息');
     }
   }, [initialData, form]);
+
+  // 将表单实例暴露给父组件
+  useEffect(() => {
+    onFormReady?.(form);
+    // 仅在首次挂载时调用一次
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onFinish = async (values: any) => {
     setLoading(true);
@@ -161,11 +173,13 @@ const PeopleForm: React.FC<PeopleFormProps> = ({ initialData }) => {
           <TextArea autoSize={{ minRows: 3, maxRows: 6 }} placeholder="例如：性格开朗、三观一致等" />
         </Form.Item>
 
-        <Form.Item>
-          <Button type="primary" htmlType="submit" loading={loading} block>
-            {loading ? '提交中...' : '提交'}
-          </Button>
-        </Form.Item>
+        {!hideSubmitButton && (
+          <Form.Item>
+            <Button type="primary" htmlType="submit" loading={loading} block>
+              {loading ? '提交中...' : '提交'}
+            </Button>
+          </Form.Item>
+        )}
       </Form>
     </div>
   );
