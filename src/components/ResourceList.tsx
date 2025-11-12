@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layout, Typography, Table, Grid, InputNumber, Button, Space, Tag, message, Modal, Dropdown, Input } from 'antd';
+import { Layout, Typography, Table, Grid, InputNumber, Button, Space, Tag, message, Modal, Dropdown, Input, Select } from 'antd';
 import type { FormInstance } from 'antd';
 import type { ColumnsType, ColumnType } from 'antd/es/table';
 import type { FilterDropdownProps } from 'antd/es/table/interface';
@@ -477,7 +477,7 @@ function buildNumberRangeFilter(dataIndex: keyof Resource, label: string): Colum
                 onClick={() => {
                   const key = `${localMin ?? ''}:${localMax ?? ''}`;
                   setSelectedKeys?.([key]);
-                  confirm?.();
+                  confirm?.({ closeDropdown: true });
                 }}
               >
                 筛选
@@ -485,8 +485,11 @@ function buildNumberRangeFilter(dataIndex: keyof Resource, label: string): Colum
               <Button
                 size="small"
                 onClick={() => {
+                  setLocalMin(undefined);
+                  setLocalMax(undefined);
                   setSelectedKeys?.([]);
                   clearFilters?.();
+                  confirm?.({ closeDropdown: true });
                 }}
               >
                 重置
@@ -505,6 +508,64 @@ function buildNumberRangeFilter(dataIndex: keyof Resource, label: string): Colum
       if (min !== undefined && val < min) return false;
       if (max !== undefined && val > max) return false;
       return true;
+    },
+  } as ColumnType<Resource>;
+}
+
+// 枚举筛选下拉（用于性别等枚举类列）
+function buildEnumFilter(dataIndex: keyof Resource, label: string, options: Array<{ label: string; value: string }>): ColumnType<Resource> {
+  return {
+    title: label,
+    dataIndex,
+    key: String(dataIndex),
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }: FilterDropdownProps) => {
+      const [val, setVal] = React.useState<string | undefined>(
+        (selectedKeys && selectedKeys[0] ? String(selectedKeys[0]) : undefined)
+      );
+      return (
+        <div className="byte-table-custom-filter" style={{ padding: 8 }}>
+          <Space direction="vertical" style={{ width: 200 }}>
+            <Select
+              allowClear
+              placeholder={`请选择${label}`}
+              value={val}
+              onChange={(v) => setVal(v)}
+              options={options}
+              style={{ width: '100%' }}
+            />
+            <Space>
+              <Button
+                type="primary"
+                size="small"
+                icon={<SearchOutlined />}
+                onClick={() => {
+                  setSelectedKeys?.(val ? [val] : []);
+                  confirm?.({ closeDropdown: true });
+                }}
+              >
+                筛选
+              </Button>
+              <Button
+                size="small"
+                onClick={() => {
+                  setVal(undefined);
+                  setSelectedKeys?.([]);
+                  clearFilters?.();
+                  confirm?.({ closeDropdown: true });
+                }}
+              >
+                重置
+              </Button>
+            </Space>
+          </Space>
+        </div>
+      );
+    },
+    onFilter: (filterValue: React.Key | boolean, record: Resource) =>
+      String((record as any)[dataIndex]) === String(filterValue),
+    render: (g: string) => {
+      const color = g === '男' ? 'blue' : g === '女' ? 'magenta' : 'default';
+      return <Tag color={color}>{g}</Tag>;
     },
   } as ColumnType<Resource>;
 }
@@ -649,21 +710,11 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
     // 非移动端显示更多列
     ...(!isMobile
       ? [
-          {
-            title: '性别',
-            dataIndex: 'gender',
-            key: 'gender',
-            filters: [
-              { text: '男', value: '男' },
-              { text: '女', value: '女' },
-              { text: '其他/保密', value: '其他/保密' },
-            ],
-            onFilter: (value: React.Key | boolean, record: Resource) => String(record.gender) === String(value),
-            render: (g: string) => {
-              const color = g === '男' ? 'blue' : g === '女' ? 'magenta' : 'default';
-              return <Tag color={color}>{g}</Tag>;
-            },
-          },
+          buildEnumFilter('gender', '性别', [
+            { label: '男', value: '男' },
+            { label: '女', value: '女' },
+            { label: '其他/保密', value: '其他/保密' },
+          ]),
           buildNumberRangeFilter('age', '年龄'),
           buildNumberRangeFilter('height', '身高'),
           {
