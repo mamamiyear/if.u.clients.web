@@ -32,7 +32,18 @@ function transformPeoples(list: People[] = []): Resource[] {
     introduction: person.introduction || {},
     contact: person.contact || '',
     cover: person.cover || '',
+    created_at: person.created_at,
   }));
+}
+
+// 格式化日期
+function formatDate(timestamp: number | null | undefined): string {
+  if (!timestamp) return '';
+  const date = new Date(timestamp * 1000);
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 // 获取人员列表数据
@@ -52,7 +63,12 @@ async function fetchResources(): Promise<Resource[]> {
     }
     
     // 转换数据格式以匹配组件期望的结构
-    return transformPeoples(response.data || []);
+    const transformed = transformPeoples(response.data || []);
+    
+    // 按 created_at 排序
+    transformed.sort((a, b) => (b.created_at || 0) - (a.created_at || 0));
+    
+    return transformed;
     
   } catch (error: any) {
     console.error('获取人员列表失败:', error);
@@ -1030,6 +1046,11 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
                     </div>
                   ) : (
                     <div style={{ color: '#9ca3af' }}>暂无介绍</div>
+                  )}
+                  {record.created_at && (
+                    <div style={{ fontSize: '12px', color: '#999', marginTop: '12px' }}>
+                      {record.created_at ? '录入于: ' + formatDate(record.created_at) : ''}
+                    </div>
                   )}
                 </div>
               );
