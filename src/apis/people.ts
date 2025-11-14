@@ -122,6 +122,25 @@ export async function updatePeople(peopleId: string, people: People): Promise<Ap
 }
 
 /**
+ * 添加或更新人员备注
+ * @param peopleId 人员ID
+ * @param content 备注内容
+ * @returns Promise<ApiResponse>
+ */
+export async function addOrUpdateRemark(peopleId: string, content: string): Promise<ApiResponse> {
+  return post<ApiResponse>(API_ENDPOINTS.PEOPLE_REMARK_BY_ID(peopleId), { content });
+}
+
+/**
+ * 删除人员备注
+ * @param peopleId 人员ID
+ * @returns Promise<ApiResponse>
+ */
+export async function deleteRemark(peopleId: string): Promise<ApiResponse> {
+  return del<ApiResponse>(API_ENDPOINTS.PEOPLE_REMARK_BY_ID(peopleId));
+}
+
+/**
  * 批量创建人员信息
  * @param peopleList 人员信息数组
  * @returns Promise<ApiResponse[]>
