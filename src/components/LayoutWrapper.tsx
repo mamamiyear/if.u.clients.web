@@ -4,6 +4,7 @@ import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import SiderMenu from './SiderMenu.tsx';
 import MainContent from './MainContent.tsx';
 import ResourceList from './ResourceList.tsx';
+import BatchRegister from './BatchRegister.tsx';
 import TopBar from './TopBar.tsx';
 import '../styles/base.css';
 import '../styles/layout.css';
@@ -21,6 +22,8 @@ const LayoutWrapper: React.FC = () => {
     switch (path) {
       case '/resources':
         return 'menu1';
+      case '/batch-register':
+        return 'batch';
       case '/menu2':
         return 'menu2';
       default:
@@ -34,6 +37,9 @@ const LayoutWrapper: React.FC = () => {
     switch (key) {
       case 'home':
         navigate('/');
+        break;
+      case 'batch':
+        navigate('/batch-register');
         break;
       case 'menu1':
         navigate('/resources');
@@ -76,6 +82,10 @@ const LayoutWrapper: React.FC = () => {
                   containerEl={layoutShellRef.current}
                 />
               }
+            />
+            <Route
+              path="/batch-register"
+              element={<BatchRegister />}
             />
             <Route
               path="/resources"

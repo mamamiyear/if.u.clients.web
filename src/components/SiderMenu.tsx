@@ -1,6 +1,6 @@
 import React from 'react';
 import { Layout, Menu, Grid, Drawer, Button } from 'antd';
-import { HeartOutlined, FormOutlined, UnorderedListOutlined, MenuOutlined } from '@ant-design/icons';
+import { HeartOutlined, FormOutlined, UnorderedListOutlined, MenuOutlined, CopyOutlined } from '@ant-design/icons';
 import './SiderMenu.css';
 
 const { Sider } = Layout;
@@ -44,8 +44,9 @@ const SiderMenu: React.FC<Props> = ({ onNavigate, selectedKey, mobileOpen, onMob
   }, [selectedKey]);
 
   const items = [
-    { key: 'home', label: '注册', icon: <FormOutlined /> },
-    { key: 'menu1', label: '列表', icon: <UnorderedListOutlined /> },
+    { key: 'home', label: '录入资源', icon: <FormOutlined /> },
+    { key: 'batch', label: '批量录入', icon: <CopyOutlined /> },
+    { key: 'menu1', label: '资源列表', icon: <UnorderedListOutlined /> },
   ];
 
   // 移动端：使用 Drawer 覆盖主内容
