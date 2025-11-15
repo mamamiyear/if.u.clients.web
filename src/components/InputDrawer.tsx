@@ -10,7 +10,7 @@ type Props = {
   onResult?: (data: any) => void;
   containerEl?: HTMLElement | null; // 抽屉挂载容器（用于放在标题栏下方）
   showUpload?: boolean; // 透传到输入面板，控制图片上传按钮
-  mode?: 'input' | 'search'; // 透传到输入面板，控制工作模式
+  mode?: 'input' | 'search' | 'batch-image'; // 透传到输入面板，控制工作模式
 };
 
 const InputDrawer: React.FC<Props> = ({ open, onClose, onResult, containerEl, showUpload = true, mode = 'input' }) => {

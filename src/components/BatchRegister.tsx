@@ -2,16 +2,19 @@ import React from 'react'
 import { Layout, Collapse, Form, Input, Button, Space, message, Spin } from 'antd'
 import type { FormInstance } from 'antd'
 import PeopleForm from './PeopleForm.tsx'
+import InputDrawer from './InputDrawer.tsx'
 import { createPeoplesBatch, type People } from '../apis'
 
 const { Panel } = Collapse as any
 const { Content } = Layout
 
-type FormItem = { id: string }
+type FormItem = { id: string; initialData?: any }
 
-const BatchRegister: React.FC = () => {
+type Props = { inputOpen?: boolean; onCloseInput?: () => void; containerEl?: HTMLElement | null }
+
+const BatchRegister: React.FC<Props> = ({ inputOpen = false, onCloseInput, containerEl }) => {
   const [commonForm] = Form.useForm()
-  const [items, setItems] = React.useState<FormItem[]>([{ id: `${Date.now()}-${Math.random()}` }])
+  const [items, setItems] = React.useState<FormItem[]>([])
   const instancesRef = React.useRef<Record<string, FormInstance>>({})
   const [loading, setLoading] = React.useState(false)
 
@@ -38,6 +41,12 @@ const BatchRegister: React.FC = () => {
       match_requirement: values.match_requirement || undefined,
       cover: values.cover || undefined,
     }
+  }
+
+  const handleInputResult = (list: any) => {
+    const arr = Array.isArray(list) ? list : [list]
+    const next: FormItem[] = arr.map((data: any) => ({ id: `${Date.now()}-${Math.random()}`, initialData: data }))
+    setItems((prev) => [...prev, ...next])
   }
 
   const handleSubmit = async () => {
@@ -89,7 +98,7 @@ const BatchRegister: React.FC = () => {
     <Content className="main-content">
       <div className="content-body">
         <Collapse defaultActiveKey={["common"]}>
-          <Panel header="公共属性" key="common">
+          <Panel header="公共信息" key="common">
             <Form form={commonForm} layout="vertical" size="large">
               <Form.Item name="contact" label="联系人">
                 <Input placeholder="请输入联系人（可留空）" />
@@ -113,6 +122,7 @@ const BatchRegister: React.FC = () => {
             >
               <PeopleForm
                 hideSubmitButton
+                initialData={item.initialData}
                 onFormReady={(f) => (instancesRef.current[item.id] = f)}
               />
             </Panel>
@@ -136,6 +146,15 @@ const BatchRegister: React.FC = () => {
           </div>
         )}
       </div>
+      {/* 批量页右侧输入抽屉，挂载到标题栏下方容器 */}
+      <InputDrawer
+        open={inputOpen || false}
+        onClose={onCloseInput || (() => {})}
+        onResult={handleInputResult}
+        containerEl={containerEl}
+        showUpload
+        mode={'batch-image'}
+      />
     </Content>
   )
 }

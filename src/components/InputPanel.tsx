@@ -9,27 +9,16 @@ const { TextArea } = Input;
 interface InputPanelProps {
   onResult?: (data: any) => void;
   showUpload?: boolean; // 是否显示图片上传按钮，默认显示
-  mode?: 'input' | 'search'; // 输入面板工作模式，默认为表单填写（input）
+  mode?: 'input' | 'search' | 'batch-image'; // 输入面板工作模式，新增批量图片模式
 }
 
 const InputPanel: React.FC<InputPanelProps> = ({ onResult, showUpload = true, mode = 'input' }) => {
   const [value, setValue] = React.useState('');
   const [fileList, setFileList] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(false);
-  const [savedText, setSavedText] = React.useState<string>('');
+  // 批量模式不保留文本内容
 
-  // 统一显示短文件名：image.{ext}
-  const getImageExt = (file: any): string => {
-    const type = file?.type || '';
-    if (typeof type === 'string' && type.startsWith('image/')) {
-      const sub = type.split('/')[1] || 'png';
-      return sub.toLowerCase();
-    }
-    const name = file?.name || '';
-    const dot = name.lastIndexOf('.');
-    const ext = dot >= 0 ? name.slice(dot + 1) : '';
-    return (ext || 'png').toLowerCase();
-  };
+  // 不需要扩展名重命名，展示 image-序号
 
   const send = async () => {
     const trimmed = value.trim();
@@ -66,6 +55,40 @@ const InputPanel: React.FC<InputPanelProps> = ({ onResult, showUpload = true, mo
       return;
     }
 
+    // 批量图片模式：循环调用图片识别 API
+    if (mode === 'batch-image') {
+      if (!hasImage) {
+        message.info('请添加至少一张图片');
+        return;
+      }
+      setLoading(true);
+      try {
+        const results: any[] = [];
+        for (let i = 0; i < fileList.length; i++) {
+          const f = fileList[i].originFileObj || fileList[i];
+          if (!f) continue;
+          const resp = await postInputImage(f);
+          if (resp && resp.error_code === 0 && resp.data) {
+            results.push(resp.data);
+          }
+        }
+        if (results.length > 0) {
+          message.success(`已识别 ${results.length} 张图片`);
+          onResult?.(results);
+        } else {
+          message.error('识别失败，请检查图片后重试');
+        }
+        setValue('');
+        setFileList([]);
+      } catch (error) {
+        console.error('批量识别失败:', error);
+        message.error('网络错误，请稍后重试');
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
     setLoading(true);
     try {
       let response;
@@ -96,7 +119,6 @@ const InputPanel: React.FC<InputPanelProps> = ({ onResult, showUpload = true, mo
         // 清空输入
         setValue('');
         setFileList([]);
-        setSavedText('');
       } else {
         message.error(response.error_info || '处理失败，请重试');
       }
@@ -129,39 +151,55 @@ const InputPanel: React.FC<InputPanelProps> = ({ onResult, showUpload = true, mo
     const items = e.clipboardData?.items;
     if (!items || items.length === 0) return;
 
-    let pastedImage: File | null = null;
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      if (item.kind === 'file') {
-        const file = item.getAsFile();
-        if (file && file.type.startsWith('image/')) {
-          pastedImage = file;
-          break; // 只取第一张
+    if (mode === 'batch-image') {
+      const newEntries: any[] = [];
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        if (item.kind === 'file') {
+          const file = item.getAsFile();
+          if (file && file.type.startsWith('image/')) {
+            const entry = {
+              uid: `${Date.now()}-${Math.random()}`,
+              name: 'image',
+              status: 'done',
+              originFileObj: file,
+            } as any;
+            newEntries.push(entry);
+          }
         }
       }
-    }
-
-    if (pastedImage) {
-      // 避免图片内容以文本方式粘贴进输入框
-      e.preventDefault();
-
-      const ext = getImageExt(pastedImage);
-      const name = `image.${ext}`;
-
-      const entry = {
-        uid: `${Date.now()}-${Math.random()}`,
-        name,
-        status: 'done',
-        originFileObj: pastedImage,
-      } as any;
-
-      // 仅保留一张：新图直接替换旧图
-      if (fileList.length === 0) {
-        setSavedText(value);
+      if (newEntries.length > 0) {
+        e.preventDefault();
+        setValue('');
+        setFileList([...fileList, ...newEntries]);
+        message.success(`已添加 ${newEntries.length} 张剪贴板图片`);
       }
-      setValue('');
-      setFileList([entry]);
-      message.success('已添加剪贴板图片');
+    } else {
+      // 单图模式：仅添加第一张并替换已有
+      let firstImage: File | null = null;
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        if (item.kind === 'file') {
+          const file = item.getAsFile();
+          if (file && file.type.startsWith('image/')) {
+            firstImage = file;
+            break;
+          }
+        }
+      }
+      if (firstImage) {
+        e.preventDefault();
+        setValue('');
+        setFileList([
+          {
+            uid: `${Date.now()}-${Math.random()}`,
+            name: 'image',
+            status: 'done',
+            originFileObj: firstImage,
+          } as any,
+        ]);
+        message.success('已添加剪贴板图片');
+      }
     }
   };
 
@@ -178,60 +216,95 @@ const InputPanel: React.FC<InputPanelProps> = ({ onResult, showUpload = true, mo
         })()}
         <TextArea
           value={value}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={(e) => {
+            if (mode === 'batch-image') {
+              setValue('');
+              return;
+            }
+            setValue(e.target.value);
+          }}
           placeholder={
-            showUpload && fileList.length > 0
-              ? '不可在添加图片时输入信息...'
-              : (showUpload ? '请输入个人信息描述，或上传图片…' : '请输入个人信息描述…')
+            mode === 'batch-image'
+              ? '批量识别不支持输入文本，可添加或粘贴多张图片...'
+              : showUpload && fileList.length > 0
+                ? '不可在添加图片时输入信息...'
+                : (showUpload ? '请输入个人信息描述，或上传图片…' : '请输入个人信息描述…')
           }
           autoSize={{ minRows: 6, maxRows: 12 }}
           style={{ fontSize: 16 }}
           onKeyDown={onKeyDown}
           onPaste={onPaste}
-          disabled={loading || (showUpload && fileList.length > 0)}
+          disabled={loading || (mode !== 'batch-image' && showUpload && fileList.length > 0)}
         />
       </Spin>
       <div className="input-actions">
         {/* 左侧文件标签显示 */}
         {showUpload && fileList.length > 0 && (
-          <Tag
-            className="selected-image-tag"
-            color="processing"
-            closable
-            onClose={() => { setFileList([]); setValue(savedText); setSavedText(''); }}
-            bordered={false}
-          >
-            {`image.${new Date().getSeconds()}.${getImageExt(fileList[0]?.originFileObj || fileList[0])}`}
-          </Tag>
+          mode === 'batch-image' ? (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {fileList.map((f, idx) => (
+                <Tag
+                  key={f.uid || idx}
+                  className="selected-image-tag"
+                  color="processing"
+                  closable
+                  onClose={() => {
+                    const next = fileList.filter((x) => x !== f)
+                    setFileList(next)
+                  }}
+                  bordered={false}
+                >
+                  {`image-${idx + 1}`}
+                </Tag>
+              ))}
+            </div>
+          ) : (
+            <Tag
+              className="selected-image-tag"
+              color="processing"
+              closable
+              onClose={() => { setFileList([]) }}
+              bordered={false}
+            >
+              {'image'}
+            </Tag>
+          )
         )}
         {showUpload && (
           <Upload
             accept="image/*"
-            multiple={false}
+            multiple={mode === 'batch-image'}
             beforeUpload={() => false}
             fileList={fileList}
-            onChange={({ file, fileList: nextFileList }) => {
-              // 只保留最新一个，并重命名为 image.{ext}
-              if (nextFileList.length === 0) {
-                setFileList([]);
-                return;
+            onChange={({ fileList: nextFileList }) => {
+              if (mode === 'batch-image') {
+                const normalized = nextFileList.map((entry: any) => {
+                  const raw = entry.originFileObj || entry;
+                  return { ...entry, name: 'image', originFileObj: raw };
+                });
+                setValue('');
+                setFileList(normalized);
+              } else {
+                if (nextFileList.length === 0) {
+                  setFileList([]);
+                  return;
+                }
+                // 仅添加第一张
+                const first = nextFileList[0] as any;
+                const raw = first.originFileObj || first;
+                const renamed = { ...first, name: 'image', originFileObj: raw };
+                setValue('');
+                setFileList([renamed]);
               }
-              const latest = nextFileList[nextFileList.length - 1] as any;
-              const raw = latest.originFileObj || file; // UploadFile 或原始 File
-              const ext = getImageExt(raw);
-              const renamed = { ...latest, name: `image.${ext}` };
-              if (fileList.length === 0) {
-                setSavedText(value);
-              }
-              setValue('');
-              setFileList([renamed]);
             }}
-            onRemove={() => { setFileList([]); setValue(savedText); setSavedText(''); return true; }}
-            maxCount={1}
+            onRemove={(file) => {
+              setFileList((prev) => prev.filter((x) => x.uid !== (file as any).uid));
+              return true;
+            }}
             showUploadList={false}
-            disabled={loading}
+            disabled={loading || (mode !== 'batch-image' && fileList.length >= 1)}
           >
-            <Button type="text" icon={<PictureOutlined />} disabled={loading} />
+            <Button type="text" icon={<PictureOutlined />} disabled={loading || (mode !== 'batch-image' && fileList.length >= 1)} />
           </Upload>
         )}
         <Button 
