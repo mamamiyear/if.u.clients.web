@@ -46,11 +46,8 @@
 
 /* 左侧文件标签样式，保持短名及紧凑展示 */
 .selected-image-tag {
-  max-width: 60%;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  max-width: none;
+  overflow: visible;
   white-space: nowrap;
-  margin-right: auto; /* 保持标签在左侧，按钮在右侧 */
+  margin-right: 0;
 }
-
-/* 移除右侧容器样式，按钮直接在 input-actions 中对齐 */

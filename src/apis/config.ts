@@ -17,4 +17,5 @@ export const API_ENDPOINTS = {
   // 新增单个资源路径 /people
   PEOPLE: '/people',
   PEOPLE_BY_ID: (id: string) => `/people/${id}`,
+  PEOPLE_REMARK_BY_ID: (id: string) => `/people/${id}/remark`,
 } as const;

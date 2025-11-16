@@ -11,7 +11,7 @@ import ImageModal from './ImageModal.tsx';
 import PeopleForm from './PeopleForm.tsx';
 import { getPeoples } from '../apis';
 import type { People } from '../apis';
-import { deletePeople, updatePeople } from '../apis/people';
+import { addOrUpdateRemark, deletePeople, deleteRemark, updatePeople } from '../apis/people';
 
 const { Content } = Layout;
 
@@ -30,9 +30,21 @@ function transformPeoples(list: People[] = []): Resource[] {
     height: person.height,
     marital_status: person.marital_status,
     introduction: person.introduction || {},
+    comments: person.comments || {},
     contact: person.contact || '',
     cover: person.cover || '',
+    created_at: person.created_at,
   }));
+}
+
+// 格式化日期
+function formatDate(timestamp: number | null | undefined): string {
+  if (!timestamp) return '';
+  const date = new Date(timestamp * 1000);
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 // 获取人员列表数据
@@ -52,7 +64,12 @@ async function fetchResources(): Promise<Resource[]> {
     }
     
     // 转换数据格式以匹配组件期望的结构
-    return transformPeoples(response.data || []);
+    const transformed = transformPeoples(response.data || []);
+    
+    // 按 created_at 排序
+    transformed.sort((a, b) => (b.created_at || 0) - (a.created_at || 0));
+    
+    return transformed;
     
   } catch (error: any) {
     console.error('获取人员列表失败:', error);
@@ -590,6 +607,10 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
   const [editingRecord, setEditingRecord] = React.useState<Resource | null>(null);
   const editFormRef = React.useRef<FormInstance | null>(null);
 
+  // 备注编辑模态框状态
+  const [remarkModalVisible, setRemarkModalVisible] = React.useState(false);
+  const [editingRemark, setEditingRemark] = React.useState<{ recordId: string; content: string } | null>(null);
+
   // 移动端编辑模式状态
   const [mobileEditing, setMobileEditing] = React.useState(false);
 
@@ -1031,6 +1052,53 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
                   ) : (
                     <div style={{ color: '#9ca3af' }}>暂无介绍</div>
                   )}
+                  {record.created_at && (
+                    <div style={{ fontSize: '12px', color: '#999', marginTop: '12px' }}>
+                      {record.created_at ? '录入于: ' + formatDate(record.created_at) : ''}
+                    </div>
+                  )}
+
+                  <div style={{ borderTop: '1px solid #f0f0f0', margin: '12px 0' }} />
+
+                  <div>
+                    <Typography.Title level={5} style={{ color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span>备注</span>
+                      {record.comments && record.comments.remark ? (
+                        <Space>
+                          <Button size="small" onClick={() => {
+                            setEditingRemark({ recordId: record.id, content: record.comments.remark.content });
+                            setRemarkModalVisible(true);
+                          }}>修改</Button>
+                          <Button size="small" danger onClick={async () => {
+                            try {
+                              const res = await deleteRemark(record.id);
+                              if (res.error_code === 0) {
+                                message.success('清空成功');
+                                await reloadResources();
+                              } else {
+                                message.error(res.error_info || '清空失败');
+                              }
+                            } catch (err) {
+                              message.error('清空失败');
+                            }
+                          }}>清空</Button>
+                        </Space>
+                      ) : (
+                        <Button size="small" onClick={() => {
+                          setEditingRemark({ recordId: record.id, content: '' });
+                          setRemarkModalVisible(true);
+                        }}>添加</Button>
+                      )}
+                    </Typography.Title>
+                    {record.comments && record.comments.remark ? (
+                      <div>
+                        <div style={{ fontSize: '12px', color: '#999', marginBottom: '8px' }}>
+                          更新于: {formatDate(record.comments.remark.updated_at)}
+                        </div>
+                        <div>{record.comments.remark.content}</div>
+                      </div>
+                    ) : null}
+                  </div>
                 </div>
               );
             },
@@ -1125,6 +1193,44 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
           />
         </Modal>
       )}
+
+      <Modal
+        open={remarkModalVisible}
+        title={editingRemark?.content ? "修改备注" : "添加备注"}
+        onCancel={() => {
+          setRemarkModalVisible(false);
+          setEditingRemark(null);
+        }}
+        onOk={async () => {
+          if (!editingRemark) return;
+          try {
+            const res = await addOrUpdateRemark(editingRemark.recordId, editingRemark.content);
+            if (res.error_code === 0) {
+              message.success(editingRemark.content ? '修改成功' : '添加成功');
+              setRemarkModalVisible(false);
+              setEditingRemark(null);
+              await reloadResources();
+            } else {
+              message.error(res.error_info || '操作失败');
+            }
+          } catch (err) {
+            message.error('操作失败');
+          }
+        }}
+        okText="确认"
+        cancelText="取消"
+      >
+        <Input.TextArea
+          rows={4}
+          value={editingRemark?.content}
+          onChange={(e) => {
+            if (editingRemark) {
+              setEditingRemark({ ...editingRemark, content: e.target.value });
+            }
+          }}
+          placeholder="请输入备注"
+        />
+      </Modal>
     </Content>
   );
 };

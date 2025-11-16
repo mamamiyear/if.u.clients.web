@@ -21,7 +21,7 @@ const MainContent: React.FC<Props> = ({ inputOpen = false, onCloseInput, contain
           ✨ 有新资源了吗?
         </Typography.Title>
         <Typography.Paragraph style={{ color: 'var(--muted)', marginBottom: 0 }}>
-          点击右上角可以直接输入个人信息描述或上传图片，我将自动整理TA的信息
+          点击右上角可以直接输入描述或上传图片
         </Typography.Paragraph>
 
         <PeopleForm initialData={formData} />

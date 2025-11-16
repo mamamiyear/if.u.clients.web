@@ -50,6 +50,7 @@ export interface People {
   age?: number;
   height?: number;
   marital_status?: string;
+  created_at?: number;
   [key: string]: any;
   cover?: string;
 }
