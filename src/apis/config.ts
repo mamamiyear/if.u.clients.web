@@ -1,7 +1,7 @@
 // API 配置
 
 export const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8099',
+  BASE_URL: import.meta.env.VITE_API_BASE_URL,
   TIMEOUT: 10000,
   HEADERS: {
     'Content-Type': 'application/json',
@@ -18,4 +18,14 @@ export const API_ENDPOINTS = {
   PEOPLE: '/people',
   PEOPLE_BY_ID: (id: string) => `/people/${id}`,
   PEOPLE_REMARK_BY_ID: (id: string) => `/people/${id}/remark`,
+  // 用户相关
+  SEND_CODE: '/user/send_code',
+  REGISTER: '/user',
+  LOGIN: '/user/login',
+  LOGOUT: '/user/me/login',
+  ME: '/user/me',
+  AVATAR: '/user/me/avatar',
+  DELETE_USER: '/user/me',
+  UPDATE_PHONE: '/user/me/phone',
+  UPDATE_EMAIL: '/user/me/email',
 } as const;

@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom'
 import 'antd/dist/reset.css'
 import './styles/base.css'
 import App from './App.tsx'
+import { AuthProvider } from './contexts/AuthContext.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -14,7 +15,9 @@ createRoot(document.getElementById('root')!).render(
         v7_startTransition: true,
       }}
     >
-      <App />
+      <AuthProvider>
+        <App />
+      </AuthProvider>
     </BrowserRouter>
   </StrictMode>,
 )

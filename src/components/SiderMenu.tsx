@@ -1,11 +1,14 @@
+import LoginModal from './LoginModal';
+import RegisterModal from './RegisterModal';
+import { useAuth } from '../contexts/AuthContext';
 import React from 'react';
 import { Layout, Menu, Grid, Drawer, Button } from 'antd';
-import { HeartOutlined, FormOutlined, UnorderedListOutlined, MenuOutlined, CopyOutlined } from '@ant-design/icons';
+import { FormOutlined, UnorderedListOutlined, MenuOutlined, CopyOutlined, UserOutlined, SettingOutlined } from '@ant-design/icons';
 import './SiderMenu.css';
+import { useNavigate } from 'react-router-dom';
 
 const { Sider } = Layout;
 
-// 新增：支持外部导航回调 + 受控选中态
 type Props = {
   onNavigate?: (key: string) => void;
   selectedKey?: string;
@@ -14,6 +17,10 @@ type Props = {
 };
 
 const SiderMenu: React.FC<Props> = ({ onNavigate, selectedKey, mobileOpen, onMobileToggle }) => {
+  const [isLoginModalOpen, setIsLoginModalOpen] = React.useState(false);
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = React.useState(false);
+  const { isAuthenticated, user, login } = useAuth();
+  const navigate = useNavigate();
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
   const [collapsed, setCollapsed] = React.useState(false);
@@ -36,7 +43,6 @@ const SiderMenu: React.FC<Props> = ({ onNavigate, selectedKey, mobileOpen, onMob
     setCollapsed(isMobile);
   }, [isMobile]);
 
-  // 根据外部 selectedKey 同步选中态
   React.useEffect(() => {
     if (selectedKey) {
       setSelectedKeys([selectedKey]);
@@ -49,11 +55,39 @@ const SiderMenu: React.FC<Props> = ({ onNavigate, selectedKey, mobileOpen, onMob
     { key: 'menu1', label: '资源列表', icon: <UnorderedListOutlined /> },
   ];
 
-  // 移动端：使用 Drawer 覆盖主内容
+  const renderSiderHeader = (options?: { setOpen?: (v: boolean) => void; collapsed?: boolean }) => (
+    <div className={`sider-header ${options?.collapsed ? 'collapsed' : ''}`}>
+      {isAuthenticated && user ? (
+        <>
+          <div className="sider-user">
+            <div className="sider-avatar-container">
+              <div className="sider-avatar-frame">
+                {user.avatar_link ? (
+                  <img src={user.avatar_link} alt="avatar" className="sider-avatar" />
+                ) : (
+                  <UserOutlined className="sider-avatar-icon" />
+                )}
+              </div>
+            </div>
+            <div className="sider-title">{user.nickname}</div>
+          </div>
+          <button type="button" className="sider-settings-btn" aria-label="设置" onClick={() => { navigate('/user'); options?.setOpen?.(false); }}>
+            <SettingOutlined />
+          </button>
+        </>
+      ) : (
+        <>
+          <Button type="primary" style={{ marginRight: 8 }} onClick={() => setIsLoginModalOpen(true)}>登录</Button>
+          <Button onClick={() => setIsRegisterModalOpen(true)}>注册</Button>
+        </>
+      )}
+    </div>
+  );
+
   if (isMobile) {
     const open = mobileOpen ?? internalMobileOpen;
     const setOpen = (v: boolean) => (onMobileToggle ? onMobileToggle(v) : setInternalMobileOpen(v));
-    const showInternalTrigger = !onMobileToggle; // 若无外部控制，则显示内部按钮
+    const showInternalTrigger = !onMobileToggle;
     return (
       <>
         {showInternalTrigger && (
@@ -73,13 +107,7 @@ const SiderMenu: React.FC<Props> = ({ onNavigate, selectedKey, mobileOpen, onMob
           rootStyle={{ top: topbarHeight, height: `calc(100% - ${topbarHeight}px)` }}
           styles={{ body: { padding: 0 }, header: { display: 'none' } }}
         >
-          <div className="sider-header">
-            <HeartOutlined style={{ fontSize: 22 }} />
-            <div>
-              <div className="sider-title">单身管理</div>
-              <div className="sider-desc">录入、展示与搜索你的单身资源</div>
-            </div>
-          </div>
+          {renderSiderHeader({ setOpen })}
           <Menu
             theme="dark"
             mode="inline"
@@ -87,36 +115,36 @@ const SiderMenu: React.FC<Props> = ({ onNavigate, selectedKey, mobileOpen, onMob
             onClick={({ key }) => {
               const k = String(key);
               setSelectedKeys([k]);
-              setOpen(false); // 选择后自动收起
+              setOpen(false);
               onNavigate?.(k);
             }}
             items={items}
           />
         </Drawer>
+        <LoginModal
+          open={isLoginModalOpen}
+          onCancel={() => setIsLoginModalOpen(false)}
+          onOk={async (values) => {
+            await login(values);
+            setIsLoginModalOpen(false);
+          }}
+          title="登录"
+        />
+        <RegisterModal open={isRegisterModalOpen} onCancel={() => setIsRegisterModalOpen(false)} />
       </>
     );
   }
 
-  // PC 端：保持 Sider 行为不变
   return (
     <Sider
-      width={260}
+      theme="dark"
       collapsible
       collapsed={collapsed}
-      onCollapse={(c) => setCollapsed(c)}
-      breakpoint="md"
-      collapsedWidth={64}
-      theme="dark"
+      onCollapse={(value) => setCollapsed(value)}
+      className="sider-menu"
+      width={240}
     >
-      <div className={`sider-header ${collapsed ? 'collapsed' : ''}`}>
-        <HeartOutlined style={{ fontSize: 22 }} />
-        {!collapsed && (
-          <div>
-            <div className="sider-title">单身管理</div>
-            <div className="sider-desc">录入、展示与搜索你的单身资源</div>
-          </div>
-        )}
-      </div>
+      {renderSiderHeader({ collapsed })}
       <Menu
         theme="dark"
         mode="inline"
@@ -128,6 +156,16 @@ const SiderMenu: React.FC<Props> = ({ onNavigate, selectedKey, mobileOpen, onMob
         }}
         items={items}
       />
+      <LoginModal
+        open={isLoginModalOpen}
+        onCancel={() => setIsLoginModalOpen(false)}
+        onOk={async (values) => {
+          await login(values);
+          setIsLoginModalOpen(false);
+        }}
+        title="登录"
+      />
+      <RegisterModal open={isRegisterModalOpen} onCancel={() => setIsRegisterModalOpen(false)} />
     </Sider>
   );
 };

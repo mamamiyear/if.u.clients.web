@@ -60,6 +60,7 @@ export async function request<T = any>(
       method,
       headers: requestHeaders,
       body: requestBody,
+      credentials: 'include',
       signal: controller.signal,
     });
 

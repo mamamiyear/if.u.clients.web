@@ -9,11 +9,13 @@ export * from './types';
 export * from './input';
 export * from './upload';
 export * from './people';
+export * from './user';
 
 // 默认导出所有API函数
 import * as inputApi from './input';
 import * as uploadApi from './upload';
 import * as peopleApi from './people';
+import * as userApi from './user';
 
 export const api = {
   // 文本输入相关
@@ -24,6 +26,9 @@ export const api = {
   
   // 人员管理相关
   people: peopleApi,
+  
+  // 用户管理相关
+  user: userApi,
 };
 
 export default api;

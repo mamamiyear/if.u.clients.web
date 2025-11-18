@@ -8,6 +8,7 @@ import BatchRegister from './BatchRegister.tsx';
 import TopBar from './TopBar.tsx';
 import '../styles/base.css';
 import '../styles/layout.css';
+import UserProfile from './UserProfile.tsx';
 
 const LayoutWrapper: React.FC = () => {
   const navigate = useNavigate();
@@ -105,6 +106,7 @@ const LayoutWrapper: React.FC = () => {
               }
             />
             <Route path="/menu2" element={<div style={{ padding: 32, color: '#cbd5e1' }}>菜单2的内容暂未实现</div>} />
+            <Route path="/user" element={<UserProfile />} />
           </Routes>
         </Layout>
       </Layout>
