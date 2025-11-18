@@ -62,3 +62,52 @@ export interface PaginatedResponse<T> {
   limit: number;
   offset: number;
 }
+
+// 用户相关类型
+
+export interface SendCodeRequest {
+  target_type: 'phone' | 'email';
+  target: string;
+  scene: 'register' | 'update';
+}
+
+export interface RegisterRequest {
+  nickname?: string;
+  avatar_link?: string;
+  email?: string;
+  phone?: string;
+  password: string;
+  code: string;
+}
+
+export interface LoginRequest {
+  email?: string;
+  phone?: string;
+  password: string;
+}
+
+export interface User {
+  id: string;
+  phone?: string;
+  email?: string;
+  created_at: string;
+  nickname: string;
+  avatar_link?: string;
+}
+
+export interface UpdateUserRequest {
+  nickname?: string;
+  avatar_link?: string;
+  phone?: string;
+  email?: string;
+}
+
+export interface UpdatePhoneRequest {
+  phone: string;
+  code: string;
+}
+
+export interface UpdateEmailRequest {
+  email: string;
+  code: string;
+}
