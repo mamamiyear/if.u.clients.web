@@ -51,6 +51,7 @@ export interface People {
   height?: number;
   marital_status?: string;
   created_at?: number;
+  match_requirement?: string;
   [key: string]: any;
   cover?: string;
 }

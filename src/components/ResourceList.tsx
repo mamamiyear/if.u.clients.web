@@ -34,6 +34,7 @@ function transformPeoples(list: People[] = []): Resource[] {
     contact: person.contact || '',
     cover: person.cover || '',
     created_at: person.created_at,
+    match_requirement: person.match_requirement,
   }));
 }
 
@@ -1057,6 +1058,17 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
                       {record.created_at ? '录入于: ' + formatDate(record.created_at) : ''}
                     </div>
                   )}
+
+                  <div style={{ marginTop: '12px' }}>
+                    <Typography.Title level={5} style={{ color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span>择偶要求</span>
+                    </Typography.Title>
+                    {record.match_requirement ? (
+                      <div>{record.match_requirement}</div>
+                    ) : (
+                      <div style={{ color: '#9ca3af' }}>暂无匹配要求</div>
+                    )}
+                  </div>
 
                   <div style={{ borderTop: '1px solid #f0f0f0', margin: '12px 0' }} />
 
