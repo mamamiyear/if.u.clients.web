@@ -22,7 +22,7 @@ export type Resource = Omit<People, 'id'> & { id: string };
 
 // 统一转换 API 返回的人员列表为表格需要的结构
 function transformPeoples(list: People[] = []): Resource[] {
-  return (list || []).map((person: any) => ({
+  return (list || []).map((person: Partial<People>) => ({
     id: person.id || `person-${Date.now()}-${Math.random()}`,
     name: person.name || '未知',
     gender: person.gender || '其他/保密',
@@ -72,7 +72,7 @@ async function fetchResources(): Promise<Resource[]> {
     
     return transformed;
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('获取人员列表失败:', error);
     message.error('获取人员列表失败，使用模拟数据');
     
@@ -463,124 +463,70 @@ async function fetchResources(): Promise<Resource[]> {
 }
 
 // 数字范围筛选下拉
+function NumberRangeFilterDropdown({ setSelectedKeys, selectedKeys, confirm, clearFilters }: FilterDropdownProps) {
+  const [min, max] = String(selectedKeys?.[0] ?? ':').split(':');
+  const [localMin, setLocalMin] = React.useState<number | undefined>(min ? Number(min) : undefined);
+  const [localMax, setLocalMax] = React.useState<number | undefined>(max ? Number(max) : undefined);
+  return (
+    <div style={{ padding: 8 }}>
+      <Space direction="vertical" style={{ width: 200 }}>
+        <InputNumber placeholder="最小值" value={localMin} onChange={(v) => setLocalMin(v ?? undefined)} style={{ width: '100%' }} />
+        <InputNumber placeholder="最大值" value={localMax} onChange={(v) => setLocalMax(v ?? undefined)} style={{ width: '100%' }} />
+        <Space>
+          <Button type="primary" size="small" icon={<SearchOutlined />} onClick={() => { const key = `${localMin ?? ''}:${localMax ?? ''}`; setSelectedKeys?.([key]); confirm?.({ closeDropdown: true }); }}>筛选</Button>
+          <Button size="small" onClick={() => { setLocalMin(undefined); setLocalMax(undefined); setSelectedKeys?.([]); clearFilters?.(); confirm?.({ closeDropdown: true }); }}>重置</Button>
+        </Space>
+      </Space>
+    </div>
+  );
+}
+
 function buildNumberRangeFilter(dataIndex: keyof Resource, label: string): ColumnType<Resource> {
   return {
     title: label,
     dataIndex,
-    sorter: (a: Resource, b: Resource) => Number((a as any)[dataIndex] ?? 0) - Number((b as any)[dataIndex] ?? 0),
-    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }: FilterDropdownProps) => {
-      const [min, max] = String(selectedKeys?.[0] ?? ':').split(':');
-      const [localMin, setLocalMin] = React.useState<number | undefined>(min ? Number(min) : undefined);
-      const [localMax, setLocalMax] = React.useState<number | undefined>(max ? Number(max) : undefined);
-      return (
-        <div style={{ padding: 8 }}>
-          <Space direction="vertical" style={{ width: 200 }}>
-            <InputNumber
-              placeholder="最小值"
-              value={localMin}
-              onChange={(v) => setLocalMin(v ?? undefined)}
-              style={{ width: '100%' }}
-            />
-            <InputNumber
-              placeholder="最大值"
-              value={localMax}
-              onChange={(v) => setLocalMax(v ?? undefined)}
-              style={{ width: '100%' }}
-            />
-            <Space>
-              <Button
-                type="primary"
-                size="small"
-                icon={<SearchOutlined />}
-                onClick={() => {
-                  const key = `${localMin ?? ''}:${localMax ?? ''}`;
-                  setSelectedKeys?.([key]);
-                  confirm?.({ closeDropdown: true });
-                }}
-              >
-                筛选
-              </Button>
-              <Button
-                size="small"
-                onClick={() => {
-                  setLocalMin(undefined);
-                  setLocalMax(undefined);
-                  setSelectedKeys?.([]);
-                  clearFilters?.();
-                  confirm?.({ closeDropdown: true });
-                }}
-              >
-                重置
-              </Button>
-            </Space>
-          </Space>
-        </div>
-      );
+    sorter: (a: Resource, b: Resource) => {
+      const av = a[dataIndex] as number | undefined;
+      const bv = b[dataIndex] as number | undefined;
+      return Number(av ?? 0) - Number(bv ?? 0);
     },
+    filterDropdown: (props) => <NumberRangeFilterDropdown {...props} />,
     onFilter: (filterValue: React.Key | boolean, record: Resource) => {
       const [minStr, maxStr] = String(filterValue).split(':');
       const min = minStr ? Number(minStr) : undefined;
       const max = maxStr ? Number(maxStr) : undefined;
-      const val = Number((record as any)[dataIndex] ?? NaN);
-      if (Number.isNaN(val)) return false;
-      if (min !== undefined && val < min) return false;
-      if (max !== undefined && val > max) return false;
+      const val = record[dataIndex] as number | undefined;
+      if (val === undefined || Number.isNaN(Number(val))) return false;
+      if (min !== undefined && Number(val) < min) return false;
+      if (max !== undefined && Number(val) > max) return false;
       return true;
     },
   } as ColumnType<Resource>;
 }
 
 // 枚举筛选下拉（用于性别等枚举类列）
+function EnumFilterDropdown({ setSelectedKeys, selectedKeys, confirm, clearFilters, options, label }: FilterDropdownProps & { options: Array<{ label: string; value: string }>; label: string }) {
+  const [val, setVal] = React.useState<string | undefined>(selectedKeys && selectedKeys[0] ? String(selectedKeys[0]) : undefined);
+  return (
+    <div className="byte-table-custom-filter" style={{ padding: 8 }}>
+      <Space direction="vertical" style={{ width: 200 }}>
+        <Select allowClear placeholder={`请选择${label}`} value={val} onChange={(v) => setVal(v)} options={options} style={{ width: '100%' }} />
+        <Space>
+          <Button type="primary" size="small" icon={<SearchOutlined />} onClick={() => { setSelectedKeys?.(val ? [val] : []); confirm?.({ closeDropdown: true }); }}>筛选</Button>
+          <Button size="small" onClick={() => { setVal(undefined); setSelectedKeys?.([]); clearFilters?.(); confirm?.({ closeDropdown: true }); }}>重置</Button>
+        </Space>
+      </Space>
+    </div>
+  );
+}
+
 function buildEnumFilter(dataIndex: keyof Resource, label: string, options: Array<{ label: string; value: string }>): ColumnType<Resource> {
   return {
     title: label,
     dataIndex,
     key: String(dataIndex),
-    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }: FilterDropdownProps) => {
-      const [val, setVal] = React.useState<string | undefined>(
-        (selectedKeys && selectedKeys[0] ? String(selectedKeys[0]) : undefined)
-      );
-      return (
-        <div className="byte-table-custom-filter" style={{ padding: 8 }}>
-          <Space direction="vertical" style={{ width: 200 }}>
-            <Select
-              allowClear
-              placeholder={`请选择${label}`}
-              value={val}
-              onChange={(v) => setVal(v)}
-              options={options}
-              style={{ width: '100%' }}
-            />
-            <Space>
-              <Button
-                type="primary"
-                size="small"
-                icon={<SearchOutlined />}
-                onClick={() => {
-                  setSelectedKeys?.(val ? [val] : []);
-                  confirm?.({ closeDropdown: true });
-                }}
-              >
-                筛选
-              </Button>
-              <Button
-                size="small"
-                onClick={() => {
-                  setVal(undefined);
-                  setSelectedKeys?.([]);
-                  clearFilters?.();
-                  confirm?.({ closeDropdown: true });
-                }}
-              >
-                重置
-              </Button>
-            </Space>
-          </Space>
-        </div>
-      );
-    },
-    onFilter: (filterValue: React.Key | boolean, record: Resource) =>
-      String((record as any)[dataIndex]) === String(filterValue),
+    filterDropdown: (props) => <EnumFilterDropdown {...props} options={options} label={label} />,
+    onFilter: (filterValue: React.Key | boolean, record: Resource) => String(record[dataIndex] ?? '') === String(filterValue),
     render: (g: string) => {
       const color = g === '男' ? 'blue' : g === '女' ? 'magenta' : 'default';
       return <Tag color={color}>{g}</Tag>;
@@ -654,7 +600,7 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
           } else {
             message.error(res.error_info || '删除失败');
           }
-        } catch (err: any) {
+        } catch {
           message.error('删除失败');
         } finally {
           await reloadResources();
@@ -688,7 +634,7 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
       onFilter: (filterValue: React.Key | boolean, record: Resource) => String(record.name).includes(String(filterValue)),
       render: (text: string, record: Resource) => {
         // 图片图标逻辑
-        const hasCover = record.cover && record.cover.trim() !== '';
+        const hasCover = typeof record.cover === 'string' && record.cover.trim() !== '';
         const pictureIcon = (
           <PictureOutlined 
             style={{ 
@@ -696,7 +642,7 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
               cursor: hasCover ? 'pointer' : 'default'
             }}
             onClick={hasCover ? () => {
-              setCurrentImageUrl(record.cover);
+              setCurrentImageUrl(record.cover as string);
               setImageModalVisible(true);
             } : undefined}
           />
@@ -834,7 +780,7 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
               title: '操作',
               key: 'actions',
               width: 80,
-              render: (_: any, record: Resource) => (
+              render: (_: unknown, record: Resource) => (
                 <Dropdown
                   trigger={["click"]}
                   menu={{
@@ -952,8 +898,9 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
                     } else {
                       message.error(res.error_info || '更新失败');
                     }
-                  } catch (err: any) {
-                    if (err?.errorFields) {
+                  } catch (err) {
+                    const hasErrorFields = typeof err === 'object' && err !== null && 'errorFields' in err;
+                    if (hasErrorFields) {
                       message.error('请完善表单后再保存');
                     } else {
                       message.error('更新失败');
@@ -1003,7 +950,7 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
                     }
                   },
                 }
-              : ({} as any)
+              : {}
           }
           pagination={{
             ...pagination,
@@ -1055,7 +1002,7 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
                   )}
                   {record.created_at && (
                     <div style={{ fontSize: '12px', color: '#999', marginTop: '12px' }}>
-                      {record.created_at ? '录入于: ' + formatDate(record.created_at) : ''}
+                      {record.created_at ? '录入于: ' + formatDate(Number(record.created_at)) : ''}
                     </div>
                   )}
 
@@ -1064,7 +1011,7 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
                       <span>择偶要求</span>
                     </Typography.Title>
                     {record.match_requirement ? (
-                      <div>{record.match_requirement}</div>
+                      <div>{String(record.match_requirement)}</div>
                     ) : (
                       <div style={{ color: '#9ca3af' }}>暂无匹配要求</div>
                     )}
@@ -1078,7 +1025,7 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
                       {record.comments && record.comments.remark ? (
                         <Space>
                           <Button size="small" onClick={() => {
-                            setEditingRemark({ recordId: record.id, content: record.comments.remark.content });
+                            setEditingRemark({ recordId: record.id, content: record.comments?.remark?.content || '' });
                             setRemarkModalVisible(true);
                           }}>修改</Button>
                           <Button size="small" danger onClick={async () => {
@@ -1090,7 +1037,7 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
                               } else {
                                 message.error(res.error_info || '清空失败');
                               }
-                            } catch (err) {
+                            } catch {
                               message.error('清空失败');
                             }
                           }}>清空</Button>
@@ -1121,7 +1068,7 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
       <InputDrawer
         open={inputOpen}
         onClose={onCloseInput || (() => {})}
-        onResult={(list: any) => {
+        onResult={(list: unknown) => {
           // setInputResult(list);
           const mapped = transformPeoples(Array.isArray(list) ? list : []);
           setData(mapped);
@@ -1186,13 +1133,14 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
               } else {
                 message.error(res.error_info || '更新失败');
               }
-            } catch (err: any) {
-              if (err?.errorFields) {
-                message.error('请完善表单后再确认');
-              } else {
-                message.error('更新失败');
+              } catch (err) {
+                const hasErrorFields = typeof err === 'object' && err !== null && 'errorFields' in err;
+                if (hasErrorFields) {
+                  message.error('请完善表单后再确认');
+                } else {
+                  message.error('更新失败');
+                }
               }
-            }
           }}
           destroyOnHidden
           okText="确认"
@@ -1225,7 +1173,7 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
             } else {
               message.error(res.error_info || '操作失败');
             }
-          } catch (err) {
+          } catch {
             message.error('操作失败');
           }
         }}

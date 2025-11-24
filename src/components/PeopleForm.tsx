@@ -8,7 +8,7 @@ import { createPeople, type People } from '../apis';
 const { TextArea } = Input;
 
 interface PeopleFormProps {
-  initialData?: any;
+  initialData?: Partial<People>;
   // 编辑模式下由父组件控制提交，隐藏内部提交按钮
   hideSubmitButton?: boolean;
   // 暴露 AntD Form 实例给父组件，用于在外部触发校验与取值
@@ -22,11 +22,7 @@ const PeopleForm: React.FC<PeopleFormProps> = ({ initialData, hideSubmitButton =
   // 当 initialData 变化时，自动填充表单
   useEffect(() => {
     if (initialData) {
-      console.log('收到API返回数据，自动填充表单:', initialData);
-      
-      // 处理返回的数据，将其转换为表单需要的格式
-      const formData: any = {};
-      
+      const formData: Partial<People> = {};
       if (initialData.name) formData.name = initialData.name;
       if (initialData.contact) formData.contact = initialData.contact;
       if (initialData.cover) formData.cover = initialData.cover;
@@ -35,13 +31,8 @@ const PeopleForm: React.FC<PeopleFormProps> = ({ initialData, hideSubmitButton =
       if (initialData.height) formData.height = initialData.height;
       if (initialData.marital_status) formData.marital_status = initialData.marital_status;
       if (initialData.match_requirement) formData.match_requirement = initialData.match_requirement;
-      if (initialData.introduction) formData.introduction = initialData.introduction;
-      
-      // 设置表单字段值
+      if (initialData.introduction) formData.introduction = initialData.introduction as Record<string, string>;
       form.setFieldsValue(formData);
-      
-      // 显示成功消息
-      // message.success('已自动填充表单，请检查并确认信息');
     }
   }, [initialData, form]);
 
@@ -52,7 +43,18 @@ const PeopleForm: React.FC<PeopleFormProps> = ({ initialData, hideSubmitButton =
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onFinish = async (values: any) => {
+  type FormValues = {
+    name: string;
+    contact?: string;
+    gender: string;
+    age: number;
+    height?: number;
+    marital_status?: string;
+    introduction?: Record<string, string>;
+    match_requirement?: string;
+    cover?: string;
+  };
+  const onFinish = async (values: FormValues) => {
     setLoading(true);
     
     try {
@@ -81,16 +83,14 @@ const PeopleForm: React.FC<PeopleFormProps> = ({ initialData, hideSubmitButton =
         message.error(response.error_info || '提交失败，请重试');
       }
       
-    } catch (error: any) {
-      console.error('提交失败:', error);
-      
-      // 根据错误类型显示不同的错误信息
-      if (error.status === 422) {
+    } catch (e) {
+      const err = e as { status?: number; message?: string };
+      if (err.status === 422) {
         message.error('表单数据格式有误，请检查输入内容');
-      } else if (error.status >= 500) {
+      } else if ((err.status ?? 0) >= 500) {
         message.error('服务器错误，请稍后重试');
       } else {
-        message.error(error.message || '提交失败，请重试');
+        message.error(err.message || '提交失败，请重试');
       }
     } finally {
       setLoading(false);

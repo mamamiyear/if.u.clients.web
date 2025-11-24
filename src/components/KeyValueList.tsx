@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Row, Col, Input, Button } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import './KeyValueList.css';
@@ -15,11 +15,8 @@ type Props = {
 const KeyValueList: React.FC<Props> = ({ value, onChange }) => {
   const [rows, setRows] = useState<KeyValuePair[]>([]);
 
+  const initializedRef = useRef(false);
   useEffect(() => {
-    // 初始化时提供一行空输入；之后只合并父值，不再自动新增空行
-    const initializedRef = (KeyValueList as any)._initializedRef || { current: false };
-    (KeyValueList as any)._initializedRef = initializedRef;
-
     setRows((prev) => {
       const existingIdByKey = new Map(prev.filter((r) => r.k).map((r) => [r.k, r.id]));
       const valuePairs: KeyValuePair[] = value

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Input, Upload, message, Button, Spin, Tag } from 'antd';
+import type { UploadFile, RcFile } from 'antd/es/upload/interface';
 import { PictureOutlined, SendOutlined, LoadingOutlined, SearchOutlined } from '@ant-design/icons';
 import { postInput, postInputImage, getPeoples } from '../apis';
 import './InputPanel.css';
@@ -7,14 +8,14 @@ import './InputPanel.css';
 const { TextArea } = Input;
 
 interface InputPanelProps {
-  onResult?: (data: any) => void;
+  onResult?: (data: unknown) => void;
   showUpload?: boolean; // 是否显示图片上传按钮，默认显示
   mode?: 'input' | 'search' | 'batch-image'; // 输入面板工作模式，新增批量图片模式
 }
 
 const InputPanel: React.FC<InputPanelProps> = ({ onResult, showUpload = true, mode = 'input' }) => {
   const [value, setValue] = React.useState('');
-  const [fileList, setFileList] = React.useState<any[]>([]);
+  const [fileList, setFileList] = React.useState<UploadFile[]>([]);
   const [loading, setLoading] = React.useState(false);
   // 批量模式不保留文本内容
 
@@ -63,9 +64,9 @@ const InputPanel: React.FC<InputPanelProps> = ({ onResult, showUpload = true, mo
       }
       setLoading(true);
       try {
-        const results: any[] = [];
+        const results: unknown[] = [];
         for (let i = 0; i < fileList.length; i++) {
-          const f = fileList[i].originFileObj || fileList[i];
+          const f = fileList[i].originFileObj as RcFile | undefined;
           if (!f) continue;
           const resp = await postInputImage(f);
           if (resp && resp.error_code === 0 && resp.data) {
@@ -95,7 +96,7 @@ const InputPanel: React.FC<InputPanelProps> = ({ onResult, showUpload = true, mo
       
       // 如果有图片，优先处理图片上传
       if (hasImage) {
-        const file = fileList[0].originFileObj || fileList[0];
+        const file = fileList[0].originFileObj as RcFile | undefined;
         if (!file) {
           message.error('图片文件无效，请重新选择');
           return;
@@ -152,18 +153,18 @@ const InputPanel: React.FC<InputPanelProps> = ({ onResult, showUpload = true, mo
     if (!items || items.length === 0) return;
 
     if (mode === 'batch-image') {
-      const newEntries: any[] = [];
+      const newEntries: UploadFile[] = [];
       for (let i = 0; i < items.length; i++) {
         const item = items[i];
         if (item.kind === 'file') {
           const file = item.getAsFile();
           if (file && file.type.startsWith('image/')) {
-            const entry = {
+            const entry: UploadFile<RcFile> = {
               uid: `${Date.now()}-${Math.random()}`,
               name: 'image',
               status: 'done',
-              originFileObj: file,
-            } as any;
+              originFileObj: file as unknown as RcFile,
+            };
             newEntries.push(entry);
           }
         }
@@ -190,14 +191,13 @@ const InputPanel: React.FC<InputPanelProps> = ({ onResult, showUpload = true, mo
       if (firstImage) {
         e.preventDefault();
         setValue('');
-        setFileList([
-          {
-            uid: `${Date.now()}-${Math.random()}`,
-            name: 'image',
-            status: 'done',
-            originFileObj: firstImage,
-          } as any,
-        ]);
+        const item: UploadFile<RcFile> = {
+          uid: `${Date.now()}-${Math.random()}`,
+          name: 'image',
+          status: 'done',
+          originFileObj: firstImage as unknown as RcFile,
+        };
+        setFileList([item]);
         message.success('已添加剪贴板图片');
       }
     }
@@ -278,9 +278,9 @@ const InputPanel: React.FC<InputPanelProps> = ({ onResult, showUpload = true, mo
             fileList={fileList}
             onChange={({ fileList: nextFileList }) => {
               if (mode === 'batch-image') {
-                const normalized = nextFileList.map((entry: any) => {
-                  const raw = entry.originFileObj || entry;
-                  return { ...entry, name: 'image', originFileObj: raw };
+                const normalized: UploadFile<RcFile>[] = nextFileList.map((entry) => {
+                  const raw = (entry as UploadFile<RcFile>).originFileObj;
+                  return { ...(entry as UploadFile<RcFile>), name: 'image', originFileObj: raw };
                 });
                 setValue('');
                 setFileList(normalized);
@@ -290,15 +290,15 @@ const InputPanel: React.FC<InputPanelProps> = ({ onResult, showUpload = true, mo
                   return;
                 }
                 // 仅添加第一张
-                const first = nextFileList[0] as any;
-                const raw = first.originFileObj || first;
-                const renamed = { ...first, name: 'image', originFileObj: raw };
+                const first = nextFileList[0] as UploadFile<RcFile>;
+                const raw = first.originFileObj;
+                const renamed: UploadFile<RcFile> = { ...first, name: 'image', originFileObj: raw };
                 setValue('');
                 setFileList([renamed]);
               }
             }}
             onRemove={(file) => {
-              setFileList((prev) => prev.filter((x) => x.uid !== (file as any).uid));
+              setFileList((prev) => prev.filter((x) => x.uid !== (file as UploadFile<RcFile>).uid));
               return true;
             }}
             showUploadList={false}

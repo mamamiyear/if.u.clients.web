@@ -1,7 +1,7 @@
 // API 请求和响应类型定义
 
 // 基础响应类型
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   data?: T;
   error_code: number;
   error_info?: string;
@@ -25,7 +25,7 @@ export interface PostInputRequest {
 
 // 人员信息请求类型
 export interface PostPeopleRequest {
-  people: Record<string, any>;
+  people: People;
 }
 
 // 人员查询参数类型
@@ -39,6 +39,7 @@ export interface GetPeoplesParams {
   offset?: number;
   search?: string;
   top_k?: number;
+  [key: string]: string | number | boolean | null | undefined;
 }
 
 // 人员信息类型
@@ -52,8 +53,9 @@ export interface People {
   marital_status?: string;
   created_at?: number;
   match_requirement?: string;
-  [key: string]: any;
   cover?: string;
+  introduction?: Record<string, string>;
+  comments?: { remark?: { content: string; updated_at: number } };
 }
 
 // 分页响应类型

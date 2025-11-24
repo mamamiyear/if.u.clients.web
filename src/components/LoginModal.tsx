@@ -1,10 +1,11 @@
 import React from 'react';
 import { Modal, Form, Input, Button, message } from 'antd';
+import type { LoginRequest } from '../apis/types';
 
 interface Props {
   open: boolean;
   onCancel: () => void;
-  onOk: (values: any) => Promise<void>;
+  onOk: (values: LoginRequest) => Promise<void>;
   title: string;
   username?: string;
   usernameReadOnly?: boolean;
@@ -30,12 +31,12 @@ const LoginModal: React.FC<Props> = ({ open, onCancel, onOk, title, username, us
       const payload = isEmail
         ? { email: username, password }
         : { phone: username, password };
-      await onOk(payload as any);
+      await onOk(payload as LoginRequest);
       if (!hideSuccessMessage) {
         message.success('登录成功');
       }
       onCancel();
-    } catch (error) {
+    } catch {
       message.error('登录失败');
     }
   };

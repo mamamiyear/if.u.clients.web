@@ -56,8 +56,8 @@ export async function postInputImageWithProgress(
         try {
           const response = xhr.responseText ? JSON.parse(xhr.responseText) : {};
           resolve(response);
-        } catch (error) {
-          resolve({error_code: 1, error_info: '解析响应失败'});
+        } catch {
+          resolve({ error_code: 1, error_info: '解析响应失败' });
         }
       } else {
         reject(new Error(`HTTP ${xhr.status}: ${xhr.statusText}`));

@@ -3,15 +3,16 @@ import { Layout, Typography } from 'antd';
 import PeopleForm from './PeopleForm.tsx';
 import InputDrawer from './InputDrawer.tsx';
 import './MainContent.css';
+import type { People } from '../apis';
 
 const { Content } = Layout;
 
 type Props = { inputOpen?: boolean; onCloseInput?: () => void; containerEl?: HTMLElement | null };
 const MainContent: React.FC<Props> = ({ inputOpen = false, onCloseInput, containerEl }) => {
-  const [formData, setFormData] = React.useState<any>(null);
+  const [formData, setFormData] = React.useState<Partial<People> | null>(null);
 
-  const handleInputResult = (data: any) => {
-    setFormData(data);
+  const handleInputResult = (data: unknown) => {
+    setFormData(data as Partial<People>);
   };
 
   return (
@@ -24,7 +25,7 @@ const MainContent: React.FC<Props> = ({ inputOpen = false, onCloseInput, contain
           点击右上角可以直接输入描述或上传图片
         </Typography.Paragraph>
 
-        <PeopleForm initialData={formData} />
+        <PeopleForm initialData={formData || undefined} />
       </div>
 
       {/* 首页右侧输入抽屉，仅在顶栏点击后弹出；挂载到标题栏下方容器 */}

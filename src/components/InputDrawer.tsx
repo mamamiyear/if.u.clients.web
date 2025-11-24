@@ -7,7 +7,7 @@ import './InputDrawer.css';
 type Props = {
   open: boolean;
   onClose: () => void;
-  onResult?: (data: any) => void;
+  onResult?: (data: unknown) => void;
   containerEl?: HTMLElement | null; // 抽屉挂载容器（用于放在标题栏下方）
   showUpload?: boolean; // 透传到输入面板，控制图片上传按钮
   mode?: 'input' | 'search' | 'batch-image'; // 透传到输入面板，控制工作模式
@@ -31,7 +31,7 @@ const InputDrawer: React.FC<Props> = ({ open, onClose, onResult, containerEl, sh
 
   // 在输入处理成功（onResult 被调用）后，自动关闭抽屉
   const handleResult = React.useCallback(
-    (data: any) => {
+    (data: unknown) => {
       onResult?.(data);
       onClose();
     },

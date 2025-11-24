@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Form, Input, Button, message } from 'antd';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 import type { RegisterRequest } from '../apis/types';
 
 interface Props {
@@ -29,7 +29,7 @@ const RegisterModal: React.FC<Props> = ({ open, onCancel }) => {
       await sendCode({ target_type, target, scene: 'register' });
       message.success('验证码已发送');
       setStep('verify');
-    } catch (error) {
+    } catch {
       message.error('发送验证码失败');
     }
   };
@@ -40,7 +40,7 @@ const RegisterModal: React.FC<Props> = ({ open, onCancel }) => {
       await register({ ...registerPayload, ...values } as RegisterRequest);
       message.success('注册成功');
       onCancel();
-    } catch (error) {
+    } catch {
       message.error('注册失败');
     }
   };

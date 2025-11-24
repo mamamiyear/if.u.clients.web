@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { login as apiLogin, register as apiRegister, sendCode as apiSendCode, getMe as apiGetMe, logout as apiLogout } from '../apis';
 import type { LoginRequest, RegisterRequest, User, SendCodeRequest } from '../apis/types';
@@ -28,9 +28,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (response.data) {
           setUser(response.data);
         }
-      } catch (error) {
+      } catch {
         setToken(null);
         localStorage.removeItem('token');
+        void 0;
       }
     };
     validateSession();
@@ -48,7 +49,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (me.data) {
         setUser(me.data);
       }
-    } catch (e) { void e; }
+    } catch {
+      void 0;
+    }
   };
 
   const logout = async () => {
@@ -79,7 +82,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (me.data) {
         setUser(me.data);
       }
-    } catch (e) { void e; }
+    } catch {
+      void 0;
+    }
   };
 
   const value = {
@@ -97,10 +102,4 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export default AuthContext;

@@ -6,16 +6,16 @@ import { API_CONFIG } from './config';
 export interface RequestOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
   headers?: Record<string, string>;
-  body?: any;
+  body?: unknown;
   timeout?: number;
 }
 
 // 自定义错误类
 export class ApiError extends Error {
   status?: number;
-  data?: any;
+  data?: unknown;
 
-  constructor(message: string, status?: number, data?: any) {
+  constructor(message: string, status?: number, data?: unknown) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
@@ -24,7 +24,7 @@ export class ApiError extends Error {
 }
 
 // 基础请求函数
-export async function request<T = any>(
+export async function request<T = unknown>(
   url: string,
   options: RequestOptions = {}
 ): Promise<T> {
@@ -67,18 +67,19 @@ export async function request<T = any>(
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      let errorData: any;
+      let errorData: unknown;
       try {
         errorData = await response.json();
       } catch {
         errorData = { message: response.statusText };
       }
 
-      throw new ApiError(
-        errorData.message || `HTTP ${response.status}: ${response.statusText}`,
-        response.status,
-        errorData
-      );
+      let messageText = `HTTP ${response.status}: ${response.statusText}`;
+      if (errorData && typeof errorData === 'object') {
+        const maybe = errorData as { message?: string };
+        messageText = maybe.message ?? messageText;
+      }
+      throw new ApiError(messageText, response.status, errorData);
     }
 
     // 检查响应是否有内容
@@ -108,7 +109,8 @@ export async function request<T = any>(
 }
 
 // GET 请求
-export function get<T = any>(url: string, params?: Record<string, any>): Promise<T> {
+type QueryParamValue = string | number | boolean | null | undefined;
+export function get<T = unknown>(url: string, params?: Record<string, QueryParamValue>): Promise<T> {
   let fullUrl = url;
   
   if (params) {
@@ -129,7 +131,7 @@ export function get<T = any>(url: string, params?: Record<string, any>): Promise
 }
 
 // POST 请求
-export function post<T = any>(url: string, data?: any, options?: Partial<RequestOptions>): Promise<T> {
+export function post<T = unknown>(url: string, data?: unknown, options?: Partial<RequestOptions>): Promise<T> {
   return request<T>(url, {
     method: 'POST',
     body: data,
@@ -138,7 +140,7 @@ export function post<T = any>(url: string, data?: any, options?: Partial<Request
 }
 
 // PUT 请求
-export function put<T = any>(url: string, data?: any): Promise<T> {
+export function put<T = unknown>(url: string, data?: unknown): Promise<T> {
   return request<T>(url, {
     method: 'PUT',
     body: data,
@@ -146,12 +148,12 @@ export function put<T = any>(url: string, data?: any): Promise<T> {
 }
 
 // DELETE 请求
-export function del<T = any>(url: string): Promise<T> {
+export function del<T = unknown>(url: string): Promise<T> {
   return request<T>(url, { method: 'DELETE' });
 }
 
 // 文件上传请求
-export function upload<T = any>(url: string, file: File, fieldName = 'file', options?: Partial<RequestOptions>): Promise<T> {
+export function upload<T = unknown>(url: string, file: File, fieldName = 'file', options?: Partial<RequestOptions>): Promise<T> {
   const formData = new FormData();
   formData.append(fieldName, file);
   

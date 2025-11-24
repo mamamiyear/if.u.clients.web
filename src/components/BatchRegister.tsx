@@ -5,10 +5,10 @@ import PeopleForm from './PeopleForm.tsx'
 import InputDrawer from './InputDrawer.tsx'
 import { createPeoplesBatch, type People } from '../apis'
 
-const { Panel } = Collapse as any
+const Panel = Collapse.Panel
 const { Content } = Layout
 
-type FormItem = { id: string; initialData?: any }
+type FormItem = { id: string; initialData?: Partial<People> }
 
 type Props = { inputOpen?: boolean; onCloseInput?: () => void; containerEl?: HTMLElement | null }
 
@@ -29,7 +29,18 @@ const BatchRegister: React.FC<Props> = ({ inputOpen = false, onCloseInput, conta
     delete instancesRef.current[id]
   }
 
-  const buildPeople = (values: any, common: any): People => {
+  type FormValues = {
+    name: string;
+    contact?: string;
+    gender: string;
+    age: number;
+    height?: number;
+    marital_status?: string;
+    introduction?: Record<string, string>;
+    match_requirement?: string;
+    cover?: string;
+  }
+  const buildPeople = (values: FormValues, common: { contact?: string }): People => {
     return {
       name: values.name,
       contact: values.contact || common.contact || undefined,
@@ -43,9 +54,9 @@ const BatchRegister: React.FC<Props> = ({ inputOpen = false, onCloseInput, conta
     }
   }
 
-  const handleInputResult = (list: any) => {
+  const handleInputResult = (list: unknown) => {
     const arr = Array.isArray(list) ? list : [list]
-    const next: FormItem[] = arr.map((data: any) => ({ id: `${Date.now()}-${Math.random()}`, initialData: data }))
+    const next: FormItem[] = arr.map((data) => ({ id: `${Date.now()}-${Math.random()}`, initialData: data as Partial<People> }))
     setItems((prev) => [...prev, ...next])
   }
 
@@ -61,12 +72,12 @@ const BatchRegister: React.FC<Props> = ({ inputOpen = false, onCloseInput, conta
         message.error('表单未就绪')
         return
       }
-      const allValues: any[] = []
+      const allValues: FormValues[] = []
       for (const f of forms) {
         try {
           const v = await f.validateFields()
           allValues.push(v)
-        } catch (err: any) {
+        } catch {
           setLoading(false)
           message.error('请完善全部表单后再提交')
           return
@@ -87,7 +98,7 @@ const BatchRegister: React.FC<Props> = ({ inputOpen = false, onCloseInput, conta
         setItems([{ id: `${Date.now()}-${Math.random()}` }])
         commonForm.resetFields()
       }
-    } catch (e: any) {
+    } catch {
       message.error('提交失败')
     } finally {
       setLoading(false)

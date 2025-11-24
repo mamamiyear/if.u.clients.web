@@ -1,6 +1,6 @@
 import LoginModal from './LoginModal';
 import RegisterModal from './RegisterModal';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 import React from 'react';
 import { Layout, Menu, Grid, Drawer, Button } from 'antd';
 import { FormOutlined, UnorderedListOutlined, MenuOutlined, CopyOutlined, UserOutlined, SettingOutlined } from '@ant-design/icons';

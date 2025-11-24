@@ -2,7 +2,7 @@ import React from 'react'
 import { Form, Input, Button, message, Card, Space, Upload, Modal } from 'antd'
 import 'react-image-crop/dist/ReactCrop.css'
 import ReactCrop, { centerCrop, makeAspectCrop, type Crop } from 'react-image-crop'
-import { useAuth } from '../contexts/AuthContext'
+import { useAuth } from '../contexts/useAuth'
 import { updateMe, deleteUser, uploadAvatar, updatePhone, updateEmail } from '../apis'
 import { UserOutlined, EditOutlined } from '@ant-design/icons'
 import LoginModal from './LoginModal';

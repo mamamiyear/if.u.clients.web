@@ -66,7 +66,7 @@ const LayoutWrapper: React.FC = () => {
         showInput={isHome || isList || isBatch}
       />
       {/* 下方为主布局：左侧菜单 + 右侧内容 */}
-      <Layout ref={layoutShellRef as any} className="layout-shell">
+      <Layout ref={layoutShellRef} className="layout-shell">
         <SiderMenu
           onNavigate={handleNavigate}
           selectedKey={selectedKey}
