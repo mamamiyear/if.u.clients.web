@@ -1,13 +1,13 @@
 // 人员管理相关 API
 
-import { get, post, del, put } from './request';
+import { get, post, del, put, upload } from './request';
 import { API_ENDPOINTS } from './config';
 import type { 
   PostPeopleRequest, 
   GetPeoplesParams, 
   People, 
   ApiResponse,
-  PaginatedResponse 
+  PaginatedResponse
 } from './types';
 
 /**
@@ -138,6 +138,25 @@ export async function addOrUpdateRemark(peopleId: string, content: string): Prom
  */
 export async function deleteRemark(peopleId: string): Promise<ApiResponse> {
   return del<ApiResponse>(API_ENDPOINTS.PEOPLE_REMARK_BY_ID(peopleId));
+}
+
+/**
+ * 上传人员照片
+ * @param peopleId 人员ID
+ * @param file 照片文件
+ * @returns Promise<ApiResponse>
+ */
+export async function uploadPeopleImage(peopleId: string, file: File): Promise<ApiResponse<string>> {
+  return upload<ApiResponse<string>>(API_ENDPOINTS.PEOPLE_IMAGE_BY_ID(peopleId), file, 'image');
+}
+
+/**
+ * 删除人员照片
+ * @param peopleId 人员ID
+ * @returns Promise<ApiResponse>
+ */
+export async function deletePeopleImage(peopleId: string): Promise<ApiResponse> {
+  return del<ApiResponse>(API_ENDPOINTS.PEOPLE_IMAGE_BY_ID(peopleId));
 }
 
 /**

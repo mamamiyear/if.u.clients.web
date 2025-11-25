@@ -107,3 +107,7 @@ export function validateImageFile(file: File, maxSize = 10 * 1024 * 1024): { val
 
   return { valid: true };
 }
+
+export async function uploadImage(file: File): Promise<ApiResponse<string>> {
+  return upload<ApiResponse<string>>(API_ENDPOINTS.UPLOAD_IMAGE, file, 'image');
+}
