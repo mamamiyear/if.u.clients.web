@@ -3,7 +3,7 @@ import RegisterModal from './RegisterModal';
 import { useAuth } from '../contexts/useAuth';
 import React from 'react';
 import { Layout, Menu, Grid, Drawer, Button } from 'antd';
-import { FormOutlined, UnorderedListOutlined, MenuOutlined, CopyOutlined, UserOutlined, SettingOutlined } from '@ant-design/icons';
+import { FormOutlined, UnorderedListOutlined, MenuOutlined, CopyOutlined, UserOutlined, SettingOutlined, TeamOutlined } from '@ant-design/icons';
 import './SiderMenu.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -50,6 +50,8 @@ const SiderMenu: React.FC<Props> = ({ onNavigate, selectedKey, mobileOpen, onMob
   }, [selectedKey]);
 
   const items = [
+    { key: 'custom-list', label: '客户列表', icon: <TeamOutlined /> },
+    { key: 'custom', label: '客户录入', icon: <UserOutlined /> },
     { key: 'home', label: '录入资源', icon: <FormOutlined /> },
     { key: 'batch', label: '批量录入', icon: <CopyOutlined /> },
     { key: 'menu1', label: '资源列表', icon: <UnorderedListOutlined /> },

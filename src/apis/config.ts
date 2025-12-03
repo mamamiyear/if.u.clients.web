@@ -10,8 +10,8 @@ export const API_CONFIG = {
 
 // API 端点
 export const API_ENDPOINTS = {
-  INPUT: '/recognition/input',
-  INPUT_IMAGE: '/recognition/image',
+  RECOGNITION_INPUT: (model: 'people' | 'custom') => `/recognition/${model}/input`,
+  RECOGNITION_IMAGE: (model: 'people' | 'custom') => `/recognition/${model}/image`,
   // 人员列表查询仍为 /peoples
   PEOPLES: '/peoples',
   // 新增单个资源路径 /people
@@ -30,4 +30,8 @@ export const API_ENDPOINTS = {
   DELETE_USER: '/user/me',
   UPDATE_PHONE: '/user/me/phone',
   UPDATE_EMAIL: '/user/me/email',
+  // 客户相关
+  CUSTOM: '/custom', // 假设的端点
+  CUSTOMS: '/customs', // 假设的端点
+  CUSTOM_IMAGE_BY_ID: (id: string) => `/custom/${id}/image`,
 } as const;

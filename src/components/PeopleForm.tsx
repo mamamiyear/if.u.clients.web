@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Select, InputNumber, Button, message, Row, Col, Image, Modal } from 'antd';
+import { Form, Input, Select, InputNumber, Button, message, Row, Col, Modal } from 'antd';
 import 'react-image-crop/dist/ReactCrop.css';
 import ReactCrop, { centerCrop, makeAspectCrop, type Crop } from 'react-image-crop';
 import { UploadOutlined } from '@ant-design/icons';
@@ -7,6 +7,7 @@ import type { FormInstance } from 'antd';
 
 import './PeopleForm.css';
 import KeyValueList from './KeyValueList.tsx'
+import ImagePreview from './ImagePreview.tsx';
 import { createPeople, type People, uploadPeopleImage, uploadImage } from '../apis';
 
 const { TextArea } = Input;
@@ -211,33 +212,13 @@ const PeopleForm: React.FC<PeopleFormProps> = ({ initialData, hideSubmitButton =
   const coverUrl = Form.useWatch('cover', form);
 
   const coverPreviewNode = (
-    <div style={{
-      width: '100%',
-      height: '100%',
-      minHeight: '264px', // 预览区固定高度，与表单保持高度对齐
-      maxHeight: '264px', // 预览区固定高度，与表单保持高度对齐
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      border: '1px dashed #d9d9d9',
-      borderRadius: '8px',
-      background: '#fafafa',
-      padding: '8px'
-    }}>
-      {coverUrl ? (
-        <Image
-          src={coverUrl}
-          alt="封面预览"
-          style={{ height: '100%', maxHeight: '248px', objectFit: 'contain' }}
-          fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMzyhRcASGUqqCZ16yno6CkYGRAQMDKMwhqj/fAIcloxgHQqxAjIHBEugw5sUIsSQpBobtQPdLciLEVJYzMPBHMDBsayhILEqEO4DxG0txmrERhM29nYGBddr//5/DGRjYNRkY/l7////39v///y4Dmn+LgeHANwDrkl1AuO+pmgAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAwqADAAQAAAABAAAAwwAAAAD9b/HnAAAHlklEQVR4Ae3dP3PTWBSGcbGzM6GCKqlIBRV0dHRJFarQ0eUT8LH4BnRU0NHR0UEFVdIlFRV7TzRksomPY8uykTk/zewQfKw/9znv4yvJynLv4uLiV2dBoDiBf4qP3/ARuCRABEFAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghggQAQZQKAnYEaQBAQaASKIAQJEkAEEegJmBElAoBEgghgg0Aj8i0JO4OzsrPv69Wv+hi2qPHr0qNvf39+iI97soRIh4f3z58/u7du3SXX7Xt7Z2enevHmzfQe+oSN2apSAPj09TSrb+XKI/f379+08+A0cNRE2ANkupk+ACNPvkSPcAAEibACyXUyfABGm3yNHuAECRNgAZLuYPgEirKlHu7u7XdyytGwHAd8jjNyng4OD7vnz51dbPT8/7z58+NB9+/bt6jU/TI+AGWHEnrx48eJ/EsSmHzx40L18+fLyzxF3ZVMjEyDCiEDjMYZZS5wiPXnyZFbJaxMhQIQRGzHvWR7XCyOCXsOmiDAi1HmPMMQjDpbpEiDCiL358eNHurW/5SnWdIBbXiDCiA38/Pnzrce2YyZ4//59F3ePLNMl4PbpiL2J0L979+7yDtHDhw8vtzzvdGnEXdvUigSIsCLAWavHp/+qM0BcXMd/q25n1vF57TYBp0a3mUzilePj4+7k5KSLb6gt6ydAhPUzXnoPR0dHl79WGTNCfBnn1uvSCJdegQhLI1vvCk+fPu2ePXt2tZOYEV6/fn31dz+shwAR1sP1cqvLntbEN9MxA9xcYjsxS1jWR4AIa2IChhEhKKTMoZ0hTwIQYUXOgjpAhLwzpDbQCBCwh_gswOQDz12JoLPj+7YM..."
-          preview={false}
-        />
-      ) : (
-        <div style={{ color: '#999' }}>封面预览</div>
-      )}
-    </div>
+    <ImagePreview
+      url={coverUrl}
+      minHeight="264px"
+      maxHeight="264px"
+      // backgroundColor="#0b0101ff"
+    />
   );
-
   return (
     <div className="people-form">
       <Form

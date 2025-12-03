@@ -9,10 +9,10 @@ import type { PostInputRequest, ApiResponse } from './types';
  * @param text 输入的文本内容
  * @returns Promise<ApiResponse>
  */
-export async function postInput(text: string): Promise<ApiResponse> {
+export async function postInput(text: string, model: 'people' | 'custom' = 'people'): Promise<ApiResponse> {
   const requestData: PostInputRequest = { text };
   // 为 postInput 设置 30 秒超时时间
-  return post<ApiResponse>(API_ENDPOINTS.INPUT, requestData, { timeout: 120000 });
+  return post<ApiResponse>(API_ENDPOINTS.RECOGNITION_INPUT(model), requestData, { timeout: 120000 });
 }
 
 /**
@@ -20,7 +20,7 @@ export async function postInput(text: string): Promise<ApiResponse> {
  * @param data 包含文本的请求对象
  * @returns Promise<ApiResponse>
  */
-export async function postInputData(data: PostInputRequest): Promise<ApiResponse> {
+export async function postInputData(data: PostInputRequest, model: 'people' | 'custom' = 'people'): Promise<ApiResponse> {
   // 为 postInputData 设置 30 秒超时时间
-  return post<ApiResponse>(API_ENDPOINTS.INPUT, data, { timeout: 120000 });
+  return post<ApiResponse>(API_ENDPOINTS.RECOGNITION_INPUT(model), data, { timeout: 120000 });
 }

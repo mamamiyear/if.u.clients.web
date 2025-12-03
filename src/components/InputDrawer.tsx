@@ -11,9 +11,10 @@ type Props = {
   containerEl?: HTMLElement | null; // 抽屉挂载容器（用于放在标题栏下方）
   showUpload?: boolean; // 透传到输入面板，控制图片上传按钮
   mode?: 'input' | 'search' | 'batch-image'; // 透传到输入面板，控制工作模式
+  targetModel?: 'people' | 'custom'; // 透传到输入面板，识别目标模型
 };
 
-const InputDrawer: React.FC<Props> = ({ open, onClose, onResult, containerEl, showUpload = true, mode = 'input' }) => {
+const InputDrawer: React.FC<Props> = ({ open, onClose, onResult, containerEl, showUpload = true, mode = 'input', targetModel = 'people' }) => {
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
   const [topbarHeight, setTopbarHeight] = React.useState<number>(56);
@@ -66,7 +67,7 @@ const InputDrawer: React.FC<Props> = ({ open, onClose, onResult, containerEl, sh
       <div className="input-drawer-inner">
         <div className="input-drawer-title">AI FIND U</div>
         <div className="input-drawer-box">
-          <InputPanel onResult={handleResult} showUpload={showUpload} mode={mode} />
+          <InputPanel onResult={handleResult} showUpload={showUpload} mode={mode} targetModel={targetModel} />
           <HintText showUpload={showUpload} />
         </div>
       </div>

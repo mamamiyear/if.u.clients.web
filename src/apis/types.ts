@@ -28,6 +28,11 @@ export interface PostPeopleRequest {
   people: People;
 }
 
+// 客户信息请求类型
+export interface PostCustomRequest {
+  custom: Custom;
+}
+
 // 人员查询参数类型
 export interface GetPeoplesParams {
   name?: string;
@@ -56,6 +61,49 @@ export interface People {
   cover?: string;
   introduction?: Record<string, string>;
   comments?: { remark?: { content: string; updated_at: number } };
+}
+
+// 客户信息类型
+export interface Custom {
+  id?: string;
+  // 基本信息
+  name: string;
+  gender: string;
+  birth: number; // int, 对应年龄转换
+  phone?: string;
+  email?: string;
+
+  // 外貌信息
+  height?: number;
+  weight?: number;
+  images?: string[]; // List[str]
+  scores?: number;
+
+  // 学历职业
+  degree?: string;
+  academy?: string;
+  occupation?: string;
+  income?: number;
+  assets?: number;
+  current_assets?: number; // 流动资产
+  house?: string; // 房产情况
+  car?: string; // 汽车情况
+  is_public?: boolean; // 是否公开
+
+  // 户口家庭
+  registered_city?: string; // 户籍城市
+  live_city?: string; // 常住城市
+  native_place?: string; // 籍贯
+  original_family?: string;
+  is_single_child?: boolean;
+
+  match_requirement?: string;
+
+  introductions?: Record<string, string>; // Dict[str, str]
+
+  // 客户信息
+  custom_level?: string; // '普通'，'VIP', '高级VIP'
+  comments?: Record<string, string>; // Dict[str, str]
 }
 
 // 分页响应类型

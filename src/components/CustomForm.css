@@ -1,0 +1,40 @@
+/* 客户信息录入表单样式 */
+.custom-form {
+  margin-top: 16px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.custom-form .ant-form-item-label > label {
+  color: var(--text-secondary);
+}
+
+.custom-form .ant-input,
+.custom-form .ant-input-affix-wrapper,
+.custom-form .ant-select-selector,
+.custom-form .ant-input-number,
+.custom-form .ant-input-number-input {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.custom-form .ant-select-selection-item,
+.custom-form .ant-select-selection-placeholder {
+  color: var(--placeholder);
+}
+.custom-form .ant-select-selection-item { color: var(--text-primary); }
+
+/* 输入占位与聚焦态 */
+.custom-form .ant-input::placeholder { color: var(--placeholder); }
+.custom-form .ant-input-number-input::placeholder { color: var(--placeholder); }
+.custom-form .ant-input:focus,
+.custom-form .ant-input-affix-wrapper-focused,
+.custom-form .ant-select-focused .ant-select-selector,
+.custom-form .ant-input-number-focused {
+  border-color: var(--color-primary-600) !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}

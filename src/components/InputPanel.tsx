@@ -11,9 +11,10 @@ interface InputPanelProps {
   onResult?: (data: unknown) => void;
   showUpload?: boolean; // 是否显示图片上传按钮，默认显示
   mode?: 'input' | 'search' | 'batch-image'; // 输入面板工作模式，新增批量图片模式
+  targetModel?: 'people' | 'custom'; // 识别目标模型，默认为 people
 }
 
-const InputPanel: React.FC<InputPanelProps> = ({ onResult, showUpload = true, mode = 'input' }) => {
+const InputPanel: React.FC<InputPanelProps> = ({ onResult, showUpload = true, mode = 'input', targetModel = 'people' }) => {
   const [value, setValue] = React.useState('');
   const [fileList, setFileList] = React.useState<UploadFile[]>([]);
   const [loading, setLoading] = React.useState(false);
@@ -68,7 +69,7 @@ const InputPanel: React.FC<InputPanelProps> = ({ onResult, showUpload = true, mo
         for (let i = 0; i < fileList.length; i++) {
           const f = fileList[i].originFileObj as RcFile | undefined;
           if (!f) continue;
-          const resp = await postInputImage(f);
+          const resp = await postInputImage(f, targetModel);
           if (resp && resp.error_code === 0 && resp.data) {
             results.push(resp.data);
           }
@@ -103,11 +104,11 @@ const InputPanel: React.FC<InputPanelProps> = ({ onResult, showUpload = true, mo
         }
         
         console.log('上传图片:', file.name);
-        response = await postInputImage(file);
+        response = await postInputImage(file, targetModel);
       } else {
         // 只有文本时，调用文本处理 API
         console.log('处理文本:', trimmed);
-        response = await postInput(trimmed);
+        response = await postInput(trimmed, targetModel);
       }
       
       console.log('API响应:', response);

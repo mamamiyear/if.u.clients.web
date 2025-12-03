@@ -165,6 +165,7 @@ const BatchRegister: React.FC<Props> = ({ inputOpen = false, onCloseInput, conta
         containerEl={containerEl}
         showUpload
         mode={'batch-image'}
+        targetModel="people"
       />
     </Content>
   )

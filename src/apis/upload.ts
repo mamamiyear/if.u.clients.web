@@ -9,13 +9,13 @@ import type { ApiResponse } from './types';
  * @param file 要上传的图片文件
  * @returns Promise<ApiResponse>
  */
-export async function postInputImage(file: File): Promise<ApiResponse> {
+export async function postInputImage(file: File, model: 'people' | 'custom' = 'people'): Promise<ApiResponse> {
   // 验证文件类型
   if (!file.type.startsWith('image/')) {
     throw new Error('只能上传图片文件');
   }
   
-  return upload<ApiResponse>(API_ENDPOINTS.INPUT_IMAGE, file, 'image', { timeout: 120000 });
+  return upload<ApiResponse>(API_ENDPOINTS.RECOGNITION_IMAGE(model), file, 'image', { timeout: 120000 });
 }
 
 /**
@@ -26,7 +26,8 @@ export async function postInputImage(file: File): Promise<ApiResponse> {
  */
 export async function postInputImageWithProgress(
   file: File,
-  onProgress?: (progress: number) => void
+  onProgress?: (progress: number) => void,
+  model: 'people' | 'custom' = 'people'
 ): Promise<ApiResponse> {
   // 验证文件类型
   if (!file.type.startsWith('image/')) {
@@ -75,7 +76,7 @@ export async function postInputImageWithProgress(
     });
 
     // 发送请求
-    xhr.open('POST', `http://127.0.0.1:8099${API_ENDPOINTS.INPUT_IMAGE}`);
+    xhr.open('POST', `http://127.0.0.1:8099${API_ENDPOINTS.RECOGNITION_IMAGE(model)}`);
     xhr.timeout = 120000; // 30秒超时
     xhr.send(formData);
   });

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layout, Typography, Table, Grid, InputNumber, Button, Space, Tag, message, Modal, Dropdown, Input, Select } from 'antd';
+import { Layout, Typography, Table, Grid, Button, Space, Tag, message, Modal, Dropdown, Input, Select } from 'antd';
 import type { FormInstance } from 'antd';
 import type { ColumnsType, ColumnType } from 'antd/es/table';
 import type { FilterDropdownProps } from 'antd/es/table/interface';
@@ -9,6 +9,7 @@ import './MainContent.css';
 import InputDrawer from './InputDrawer.tsx';
 import ImageModal from './ImageModal.tsx';
 import PeopleForm from './PeopleForm.tsx';
+import NumberRangeFilterDropdown from './NumberRangeFilterDropdown';
 import { getPeoples } from '../apis';
 import type { People } from '../apis';
 import { addOrUpdateRemark, deletePeople, deleteRemark, updatePeople } from '../apis/people';
@@ -463,23 +464,7 @@ async function fetchResources(): Promise<Resource[]> {
 }
 
 // 数字范围筛选下拉
-function NumberRangeFilterDropdown({ setSelectedKeys, selectedKeys, confirm, clearFilters }: FilterDropdownProps) {
-  const [min, max] = String(selectedKeys?.[0] ?? ':').split(':');
-  const [localMin, setLocalMin] = React.useState<number | undefined>(min ? Number(min) : undefined);
-  const [localMax, setLocalMax] = React.useState<number | undefined>(max ? Number(max) : undefined);
-  return (
-    <div style={{ padding: 8 }}>
-      <Space direction="vertical" style={{ width: 200 }}>
-        <InputNumber placeholder="最小值" value={localMin} onChange={(v) => setLocalMin(v ?? undefined)} style={{ width: '100%' }} />
-        <InputNumber placeholder="最大值" value={localMax} onChange={(v) => setLocalMax(v ?? undefined)} style={{ width: '100%' }} />
-        <Space>
-          <Button type="primary" size="small" icon={<SearchOutlined />} onClick={() => { const key = `${localMin ?? ''}:${localMax ?? ''}`; setSelectedKeys?.([key]); confirm?.({ closeDropdown: true }); }}>筛选</Button>
-          <Button size="small" onClick={() => { setLocalMin(undefined); setLocalMax(undefined); setSelectedKeys?.([]); clearFilters?.(); confirm?.({ closeDropdown: true }); }}>重置</Button>
-        </Space>
-      </Space>
-    </div>
-  );
-}
+// 已替换为引入的 NumberRangeFilterDropdown 组件
 
 function buildNumberRangeFilter(dataIndex: keyof Resource, label: string): ColumnType<Resource> {
   return {
@@ -490,15 +475,25 @@ function buildNumberRangeFilter(dataIndex: keyof Resource, label: string): Colum
       const bv = b[dataIndex] as number | undefined;
       return Number(av ?? 0) - Number(bv ?? 0);
     },
-    filterDropdown: (props) => <NumberRangeFilterDropdown {...props} />,
+    filterDropdown: (props) => (
+      <NumberRangeFilterDropdown 
+        {...props} 
+        clearFilters={() => props.clearFilters?.()} 
+      />
+    ),
     onFilter: (filterValue: React.Key | boolean, record: Resource) => {
-      const [minStr, maxStr] = String(filterValue).split(':');
+      // 适配新组件的逗号分隔格式
+      const [minStr, maxStr] = String(filterValue).split(',');
       const min = minStr ? Number(minStr) : undefined;
       const max = maxStr ? Number(maxStr) : undefined;
       const val = record[dataIndex] as number | undefined;
-      if (val === undefined || Number.isNaN(Number(val))) return false;
-      if (min !== undefined && Number(val) < min) return false;
-      if (max !== undefined && Number(val) > max) return false;
+      
+      // 如果值无效，视为不匹配（或者根据需求调整）
+      if (val === undefined || val === null || Number.isNaN(Number(val))) return false;
+      
+      const numVal = Number(val);
+      if (min !== undefined && !isNaN(min) && numVal < min) return false;
+      if (max !== undefined && !isNaN(max) && numVal > max) return false;
       return true;
     },
   } as ColumnType<Resource>;
@@ -1083,7 +1078,7 @@ const ResourceList: React.FC<Props> = ({ inputOpen = false, onCloseInput, contai
       {/* 图片预览弹窗 */}
       <ImageModal
         visible={imageModalVisible}
-        imageUrl={currentImageUrl}
+        images={currentImageUrl ? [currentImageUrl] : []}
         onClose={() => {
           setImageModalVisible(false);
           setCurrentImageUrl('');
