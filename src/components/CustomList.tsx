@@ -563,7 +563,8 @@ const CustomList: React.FC = () => {
           </Button>
         ]}
         width={screens.lg ? 1000 : screens.md ? 700 : '95%'}
-        destroyOnClose
+        destroyOnHidden={true}
+        maskClosable={false}
         centered
       >
         <div style={{ display: 'flex', justifyContent: 'center', background: '#f0f2f5', padding: '16px' }}>
@@ -586,8 +587,8 @@ const CustomList: React.FC = () => {
           editFormRef.current?.submit();
         }}
         width={800}
+        destroyOnHidden={true}
         maskClosable={false}
-        destroyOnClose
       >
         <CustomForm 
           initialData={editingRecord || undefined} 

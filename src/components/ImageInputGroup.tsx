@@ -31,11 +31,7 @@ const ImageInputGroup: React.FC<ImageInputGroupProps> = ({ value = [], onChange,
   const isMobile = !screens.md;
 
   // Internal state to manage the list of images
-  const [images, setImages] = useState<string[]>(value);
-
-  useEffect(() => {
-    setImages(value);
-  }, [value]);
+  const images = value || [];
 
   // Ensure previewIndex is valid
   useEffect(() => {
@@ -47,7 +43,6 @@ const ImageInputGroup: React.FC<ImageInputGroupProps> = ({ value = [], onChange,
   const currentPreviewUrl = images[previewIndex] || '';
 
   const triggerChange = (newImages: string[]) => {
-    setImages(newImages);
     onChange?.(newImages);
   };
 
@@ -294,7 +289,8 @@ const ImageInputGroup: React.FC<ImageInputGroupProps> = ({ value = [], onChange,
         onOk={onOk}
         onCancel={() => setModalVisible(false)}
         confirmLoading={uploading}
-        destroyOnClose
+        destroyOnHidden={true}
+        maskClosable={false}
       >
         {imgSrc && (
           <ReactCrop

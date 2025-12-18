@@ -145,7 +145,8 @@ const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
           确定
         </Button>,
       ]}
-      destroyOnClose
+      destroyOnHidden={true}
+      maskClosable={false}
     >
       <div style={{ display: 'flex', justifyContent: 'center', maxHeight: '60vh', overflow: 'auto' }}>
         <ReactCrop
