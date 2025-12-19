@@ -424,6 +424,7 @@ const CustomList: React.FC = () => {
           <Descriptions.Item label="体重">{record.weight ? `${record.weight}kg` : '-'}</Descriptions.Item>
           <Descriptions.Item label="电话">{record.phone || '-'}</Descriptions.Item>
           <Descriptions.Item label="邮箱">{record.email || '-'}</Descriptions.Item>
+          <Descriptions.Item label="婚姻状况">{record.marital || '-'}</Descriptions.Item>
         </Descriptions>
         
         <div style={{ margin: '16px 0', borderBottom: '1px solid #f0f0f0' }} />

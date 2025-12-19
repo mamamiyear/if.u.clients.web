@@ -203,16 +203,26 @@ const CustomForm: React.FC<CustomFormProps> = ({ initialData, hideSubmitButton =
           </Col>
         </Row>
 
-        {/* Row 2: 电话、邮箱 */}
+        {/* Row 2: 电话、邮箱、婚姻状况 */}
         <Row gutter={[12, 12]}>
-          <Col xs={24} md={12}>
+          <Col xs={24} md={8}>
             <Form.Item name="phone" label="电话">
               <Input placeholder="请输入电话" />
             </Form.Item>
           </Col>
-          <Col xs={24} md={12}>
+          <Col xs={24} md={8}>
             <Form.Item name="email" label="邮箱">
               <Input placeholder="请输入邮箱" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={8}>
+            <Form.Item name="marital" label="婚姻状况">
+              <Select placeholder="请选择" allowClear>
+                <Select.Option value="未婚">未婚</Select.Option>
+                <Select.Option value="离异">离异</Select.Option>
+                <Select.Option value="丧偶">丧偶</Select.Option>
+                <Select.Option value="未知">未知</Select.Option>
+              </Select>
             </Form.Item>
           </Col>
         </Row>

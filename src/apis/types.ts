@@ -70,6 +70,7 @@ export interface Custom {
   name: string;
   gender: string;
   birth: number; // int, 对应年龄转换
+  marital?: string; // 婚姻状况
   phone?: string;
   email?: string;
 
