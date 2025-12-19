@@ -19,24 +19,24 @@ const LayoutWrapper: React.FC = () => {
   const isMobile = !screens.md;
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [inputOpen, setInputOpen] = React.useState(false);
-  const isResourceInput = location.pathname === '/resource-input';
+  const isResourceInput = location.pathname === '/resource/register';
   const isList = location.pathname === '/resources';
-  const isBatch = location.pathname === '/batch-register';
+  const isBatch = location.pathname === '/resources/register';
   const layoutShellRef = React.useRef<HTMLDivElement>(null);
 
   const pathToKey = (path: string) => {
     switch (path) {
-      case '/custom-register':
+      case '/custom/register':
         return 'custom';
       case '/resources':
         return 'menu1';
-      case '/batch-register':
+      case '/resources/register':
         return 'batch';
-      case '/custom-list':
+      case '/customs':
         return 'custom-list';
       case '/menu2':
         return 'menu2';
-      case '/resource-input':
+      case '/resource/register':
         return 'home';
       default:
         // 根路径重定向到客户列表，所以默认可以选中 custom-list，或者不做处理
@@ -50,16 +50,16 @@ const LayoutWrapper: React.FC = () => {
   const handleNavigate = (key: string) => {
     switch (key) {
       case 'home':
-        navigate('/resource-input');
+        navigate('/resource/register');
         break;
       case 'custom':
-        navigate('/custom-register');
+        navigate('/custom/register');
         break;
       case 'batch':
-        navigate('/batch-register');
+        navigate('/resources/register');
         break;
       case 'custom-list':
-        navigate('/custom-list');
+        navigate('/customs');
         break;
       case 'menu1':
         navigate('/resources');
@@ -68,7 +68,7 @@ const LayoutWrapper: React.FC = () => {
         navigate('/menu2');
         break;
       default:
-        navigate('/custom-list');
+        navigate('/customs');
         break;
     }
     // 切换页面时收起输入抽屉
@@ -93,9 +93,9 @@ const LayoutWrapper: React.FC = () => {
         />
         <Layout>
           <Routes>
-            <Route path="/" element={<Navigate to="/custom-list" replace />} />
+            <Route path="/" element={<Navigate to="/customs" replace />} />
             <Route
-              path="/resource-input"
+              path="/resource/register"
               element={
                 <MainContent
                   inputOpen={inputOpen}
@@ -105,7 +105,7 @@ const LayoutWrapper: React.FC = () => {
               }
             />
             <Route
-              path="/custom-register"
+              path="/custom/register"
               element={
                 <CustomRegister
                   inputOpen={inputOpen}
@@ -115,7 +115,7 @@ const LayoutWrapper: React.FC = () => {
               }
             />
             <Route
-              path="/batch-register"
+              path="/resources/register"
               element={
                 <BatchRegister
                   inputOpen={inputOpen}
@@ -125,7 +125,7 @@ const LayoutWrapper: React.FC = () => {
               }
             />
             <Route
-              path="/custom-list"
+              path="/customs"
               element={
                 <CustomList />
               }
