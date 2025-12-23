@@ -34,4 +34,8 @@ export const API_ENDPOINTS = {
   CUSTOM: '/custom', // 假设的端点
   CUSTOMS: '/customs', // 假设的端点
   CUSTOM_IMAGE_BY_ID: (id: string) => `/custom/${id}/image`,
+  CUSTOM_COMMENT_BY_ID: (id: string) => `/custom/${id}/comment`,
+  CUSTOM_COMMENTS_BY_ID: (id: string) => `/custom/${id}/comments`,
+  CUSTOM_COMMENT_UPDATE_DELETE: (customId: string, commentId: string) => `/custom/${customId}/comment/${commentId}`,
+  USER_BY_ID: (id: string) => `/user/${id}`,
 } as const;

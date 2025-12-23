@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Layout, Typography, Table, Grid, Button, Space, message, Descriptions, Tag, Modal, Popconfirm, Dropdown } from 'antd';
+import { Layout, Typography, Table, Grid, Button, Space, message, Tag, Modal, Popconfirm, Dropdown, Tabs, Input } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import type { FormInstance } from 'antd';
 import { 
@@ -12,7 +12,7 @@ import {
   EllipsisOutlined,
   ShareAltOutlined,
   DownloadOutlined,
-  CopyOutlined
+  CopyOutlined,
 } from '@ant-design/icons';
 import { getCustoms, deleteCustom } from '../apis/custom';
 import type { Custom } from '../apis/types';
@@ -30,6 +30,8 @@ const { useBreakpoint } = Grid;
 
 // 扩展 Custom 类型以确保 id 存在
 type CustomResource = Custom & { id: string };
+
+import ExpandedRow from './CustomListExpandedRow';
 
 const CustomList: React.FC = () => {
   const { user } = useAuth();
@@ -418,69 +420,16 @@ const CustomList: React.FC = () => {
   // 展开行渲染
   const expandedRowRender = (record: CustomResource) => {
     return (
-      <div style={{ padding: '0 24px', backgroundColor: '#fafafa' }}>
-        <Descriptions title="基础信息" bordered size="small" column={{ xs: 1, sm: 2, md: 2, lg: 2, xl: 2, xxl: 2 }}>
-          <Descriptions.Item label="身高">{record.height ? `${record.height}cm` : '-'}</Descriptions.Item>
-          <Descriptions.Item label="体重">{record.weight ? `${record.weight}kg` : '-'}</Descriptions.Item>
-          <Descriptions.Item label="电话">{record.phone || '-'}</Descriptions.Item>
-          <Descriptions.Item label="邮箱">{record.email || '-'}</Descriptions.Item>
-          <Descriptions.Item label="婚姻状况">{record.marital || '-'}</Descriptions.Item>
-        </Descriptions>
-        
-        <div style={{ margin: '16px 0', borderBottom: '1px solid #f0f0f0' }} />
-        
-        <Descriptions title="学历工作" bordered size="small" column={{ xs: 1, sm: 2, md: 2, lg: 2, xl: 2, xxl: 2 }}>
-          <Descriptions.Item label="学位">{record.degree || '-'}</Descriptions.Item>
-          <Descriptions.Item label="学校">{record.academy || '-'}</Descriptions.Item>
-          <Descriptions.Item label="职业">{record.occupation || '-'}</Descriptions.Item>
-          <Descriptions.Item label="收入">{record.income ? `${record.income}万` : '-'}</Descriptions.Item>
-          <Descriptions.Item label="资产">{record.assets ? `${record.assets}万` : '-'}</Descriptions.Item>
-          <Descriptions.Item label="流动资产">{record.current_assets ? `${record.current_assets}万` : '-'}</Descriptions.Item>
-          <Descriptions.Item label="房产情况">{record.house || '-'}</Descriptions.Item>
-          <Descriptions.Item label="汽车情况">{record.car || '-'}</Descriptions.Item>
-        </Descriptions>
-
-        <div style={{ margin: '16px 0', borderBottom: '1px solid #f0f0f0' }} />
-
-        <Descriptions title="所在城市" bordered size="small" column={{ xs: 1, sm: 2, md: 3 }}>
-          <Descriptions.Item label="户籍城市">{record.registered_city || '-'}</Descriptions.Item>
-          <Descriptions.Item label="常住城市">{record.live_city || '-'}</Descriptions.Item>
-          <Descriptions.Item label="籍贯城市">{record.native_place || '-'}</Descriptions.Item>
-        </Descriptions>
-
-        <div style={{ margin: '16px 0', borderBottom: '1px solid #f0f0f0' }} />
-
-        <Descriptions title="原生家庭" bordered size="small" column={{ xs: 1, sm: 2, md: 2, lg: 2, xl: 2, xxl: 2 }}>
-          <Descriptions.Item label="独生子女">{record.is_single_child ? '是' : '否'}</Descriptions.Item>
-          <Descriptions.Item label="家庭情况">{record.original_family || '-'}</Descriptions.Item>
-        </Descriptions>
-
-        <div style={{ margin: '16px 0', borderBottom: '1px solid #f0f0f0' }} />
-
-        <Descriptions title="其他信息" bordered size="small" column={1}>
-          {record.introductions && Object.entries(record.introductions).map(([key, value]) => (
-            <Descriptions.Item label={key} key={key}>{value}</Descriptions.Item>
-          ))}
-        </Descriptions>
-
-        <div style={{ margin: '16px 0', borderBottom: '1px solid #f0f0f0' }} />
-
-        <Descriptions title="择偶要求" bordered size="small" column={1}>
-          <Descriptions.Item label="要求内容">
-            <div style={{ whiteSpace: 'pre-wrap' }}>{record.match_requirement || '-'}</div>
-          </Descriptions.Item>
-        </Descriptions>
-
-        <div style={{ margin: '16px 0', borderBottom: '1px solid #f0f0f0' }} />
-
-        <Descriptions title="管理信息" bordered size="small" column={1}>
-          <Descriptions.Item label="客户等级">{record.custom_level || '-'}</Descriptions.Item>
-          <Descriptions.Item label="是否公开">{record.is_public ? '是' : '否'}</Descriptions.Item>
-          {record.comments && Object.entries(record.comments).map(([key, value]) => (
-            <Descriptions.Item label={key} key={`comment-${key}`}>{value}</Descriptions.Item>
-          ))}
-        </Descriptions>
-      </div>
+      <ExpandedRow 
+        record={record} 
+        currentUserId={user?.id}
+        onDataUpdate={(updatedRecord) => {
+          // 更新本地数据，保持一致性
+          setData(prev => prev.map(item => 
+            item.id === record.id ? updatedRecord : item
+          ));
+        }}
+      />
     );
   };
 

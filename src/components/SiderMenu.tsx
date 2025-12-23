@@ -6,6 +6,7 @@ import { Layout, Menu, Grid, Drawer, Button } from 'antd';
 import { FormOutlined, UnorderedListOutlined, MenuOutlined, CopyOutlined, UserOutlined, SettingOutlined, TeamOutlined } from '@ant-design/icons';
 import './SiderMenu.css';
 import { useNavigate } from 'react-router-dom';
+import UserAvatar from './UserAvatar';
 
 const { Sider } = Layout;
 
@@ -63,15 +64,21 @@ const SiderMenu: React.FC<Props> = ({ onNavigate, selectedKey, mobileOpen, onMob
         <>
           <div className="sider-user">
             <div className="sider-avatar-container">
-              <div className="sider-avatar-frame">
-                {user.avatar_link ? (
-                  <img src={user.avatar_link} alt="avatar" className="sider-avatar" />
-                ) : (
-                  <UserOutlined className="sider-avatar-icon" />
-                )}
-              </div>
+              <UserAvatar 
+                user={user} 
+                size={40} 
+                style={{ 
+                  border: '2px solid rgba(255,255,255,0.6)', 
+                  borderRadius: '50%' 
+                }}
+              />
             </div>
-            <div className="sider-title">{user.nickname}</div>
+            <div className="sider-info">
+              <div className="sider-title">{user.nickname}</div>
+              {user.organization && (
+                <div className="sider-org">@{user.organization.name}</div>
+              )}
+            </div>
           </div>
           <button type="button" className="sider-settings-btn" aria-label="设置" onClick={() => { navigate('/user'); options?.setOpen?.(false); }}>
             <SettingOutlined />

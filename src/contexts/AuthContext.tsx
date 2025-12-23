@@ -5,8 +5,8 @@ import type { LoginRequest, RegisterRequest, User, SendCodeRequest } from '../ap
 
 interface AuthContextType {
   user: User | null;
-  token: string | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
   login: (data: LoginRequest) => Promise<void>;
   logout: () => Promise<void>;
   clearLocalSession: () => void;
@@ -19,7 +19,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const validateSession = async () => {
@@ -29,21 +29,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setUser(response.data);
         }
       } catch {
-        setToken(null);
-        localStorage.removeItem('token');
-        void 0;
+        // Session invalid
+      } finally {
+        setIsLoading(false);
       }
     };
     validateSession();
-  }, [token]);
+  }, []);
 
   const login = async (data: LoginRequest) => {
-    const response = await apiLogin(data);
-    if (response.data?.token) {
-      const newToken = response.data.token;
-      setToken(newToken);
-      localStorage.setItem('token', newToken);
-    }
+    await apiLogin(data);
     try {
       const me = await apiGetMe();
       if (me.data) {
@@ -57,14 +52,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = async () => {
     await apiLogout();
     setUser(null);
-    setToken(null);
-    localStorage.removeItem('token');
   };
 
   const clearLocalSession = () => {
     setUser(null);
-    setToken(null);
-    localStorage.removeItem('token');
   };
 
   const register = async (data: RegisterRequest) => {
@@ -89,8 +80,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const value = {
     user,
-    token,
-    isAuthenticated: !!token || !!user,
+    isAuthenticated: !!user,
+    isLoading,
     login,
     logout,
     clearLocalSession,

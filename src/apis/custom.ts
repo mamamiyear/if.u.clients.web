@@ -7,6 +7,7 @@ import type {
   Custom, 
   ApiResponse,
   PaginatedResponse,
+  Comment,
 } from './types';
 
 /**
@@ -73,4 +74,44 @@ export async function deleteCustom(id: string): Promise<ApiResponse> {
  */
 export async function uploadCustomImage(id: string, file: File): Promise<ApiResponse<string>> {
   return upload<ApiResponse<string>>(API_ENDPOINTS.CUSTOM_IMAGE_BY_ID(id), file, 'image');
+}
+
+/**
+ * 添加客户评论
+ * @param customId 客户ID
+ * @param content 评论内容
+ * @returns Promise<ApiResponse>
+ */
+export async function addCustomComment(customId: string, content: string): Promise<ApiResponse> {
+  return post<ApiResponse>(API_ENDPOINTS.CUSTOM_COMMENT_BY_ID(customId), { content });
+}
+
+/**
+ * 获取客户评论列表
+ * @param customId 客户ID
+ * @returns Promise<ApiResponse<Comment[]>>
+ */
+export async function getCustomComments(customId: string): Promise<ApiResponse<Comment[]>> {
+  return get<ApiResponse<Comment[]>>(API_ENDPOINTS.CUSTOM_COMMENTS_BY_ID(customId));
+}
+
+/**
+ * 更新客户评论
+ * @param customId 客户ID
+ * @param commentId 评论ID
+ * @param content 评论内容
+ * @returns Promise<ApiResponse>
+ */
+export async function updateCustomComment(customId: string, commentId: string, content: string): Promise<ApiResponse> {
+  return put<ApiResponse>(API_ENDPOINTS.CUSTOM_COMMENT_UPDATE_DELETE(customId, commentId), { content });
+}
+
+/**
+ * 删除客户评论
+ * @param customId 客户ID
+ * @param commentId 评论ID
+ * @returns Promise<ApiResponse>
+ */
+export async function deleteCustomComment(customId: string, commentId: string): Promise<ApiResponse> {
+  return del<ApiResponse>(API_ENDPOINTS.CUSTOM_COMMENT_UPDATE_DELETE(customId, commentId));
 }

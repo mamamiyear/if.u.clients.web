@@ -24,10 +24,10 @@ export async function register(data: RegisterRequest): Promise<ApiResponse> {
 /**
  * 用户登录
  * @param data 登录信息
- * @returns Promise<ApiResponse<{token: string}>>
+ * @returns Promise<ApiResponse<{expired_at: number}>>
  */
-export async function login(data: LoginRequest): Promise<ApiResponse<{token: string}>> {
-  return post<ApiResponse<{token: string}>>(API_ENDPOINTS.LOGIN, data);
+export async function login(data: LoginRequest): Promise<ApiResponse<{expired_at: number}>> {
+  return post<ApiResponse<{expired_at: number}>>(API_ENDPOINTS.LOGIN, data);
 }
 
 /**
@@ -78,4 +78,13 @@ export async function updatePhone(data: UpdatePhoneRequest): Promise<ApiResponse
 
 export async function updateEmail(data: UpdateEmailRequest): Promise<ApiResponse<User>> {
   return put<ApiResponse<User>>(API_ENDPOINTS.UPDATE_EMAIL, data);
+}
+
+/**
+ * 根据ID获取用户信息
+ * @param id 用户ID
+ * @returns Promise<ApiResponse<User>>
+ */
+export async function getUserById(id: string): Promise<ApiResponse<User>> {
+  return get<ApiResponse<User>>(API_ENDPOINTS.USER_BY_ID(id));
 }

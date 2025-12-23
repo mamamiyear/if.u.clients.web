@@ -100,7 +100,7 @@ const CustomForm: React.FC<CustomFormProps> = ({ initialData, hideSubmitButton =
         introductions: values.introductions || {},
         
         custom_level: values.custom_level || '普通',
-        comments: values.comments || {},
+        comments: values.comments || [],
       };
 
       console.log('提交客户数据:', customData);

@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/useAuth'
 import { updateMe, deleteUser, uploadAvatar, updatePhone, updateEmail } from '../apis'
 import { UserOutlined, EditOutlined } from '@ant-design/icons'
 import LoginModal from './LoginModal';
+import UserAvatar from './UserAvatar';
 import { useNavigate } from 'react-router-dom'
 
 function canvasPreview(
@@ -274,12 +275,12 @@ const UserProfile: React.FC = () => {
             showUploadList={false}
             accept='image/*'
           >
-            {user?.avatar_link ? (
-              <img src={user.avatar_link} alt="avatar" style={{ width: 96, height: 96, borderRadius: '50%', objectFit: 'cover', cursor: 'pointer' }} />
-            ) : (
-              <div style={{ width: 96, height: 96, borderRadius: '50%', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                <UserOutlined style={{ fontSize: 48, color: '#999' }} />
-              </div>
+            {user && (
+              <UserAvatar 
+                user={user} 
+                size={96} 
+                style={{ cursor: 'pointer' }} 
+              />
             )}
           </Upload>
           <p style={{ fontSize: 12, color: '#999', textAlign: 'center', marginTop: 8 }}>点击更换头像</p>
@@ -287,6 +288,14 @@ const UserProfile: React.FC = () => {
         <Form form={form} layout="vertical">
           <Form.Item name="nickname" label="昵称" rules={[{ required: true, message: '请输入昵称' }]}>
             <Input />
+          </Form.Item>
+          <Form.Item label="所属">
+            <Input 
+              value={user?.organization?.name || '暂无组织信息'} 
+              readOnly 
+              disabled 
+              style={{ width: '100%', backgroundColor: '#f5f5f5', color: 'rgba(0, 0, 0, 0.45)' }} 
+            />
           </Form.Item>
           <Form.Item name="phone" label="手机号">
             <Input
