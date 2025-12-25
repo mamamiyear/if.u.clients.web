@@ -1,30 +1,25 @@
 import React from 'react';
-import { Grid } from 'antd';
-import { MenuOutlined, RobotOutlined } from '@ant-design/icons';
+import { RobotOutlined } from '@ant-design/icons';
 import './TopBar.css';
 
 type Props = {
-  onToggleMenu?: () => void;
+  onToggleMenu?: () => void; // Deprecated but kept for type safety if needed elsewhere
   onToggleInput?: () => void;
   showInput?: boolean;
 };
 
-const TopBar: React.FC<Props> = ({ onToggleMenu, onToggleInput, showInput }) => {
-  const screens = Grid.useBreakpoint();
-  const isMobile = !screens.md;
+const TopBar: React.FC<Props> = ({ onToggleInput, showInput }) => {
+  // const screens = Grid.useBreakpoint();
+  // const isMobile = !screens.md;
 
   return (
     <div className="topbar">
       <div className="topbar-left">
-        {isMobile && (
-          <button className="icon-btn" onClick={onToggleMenu} aria-label="打开/收起菜单">
-            <MenuOutlined />
-          </button>
-        )}
+        {/* Menu button removed as we use Bottom Navigation on Mobile */}
       </div>
 
       <div className="topbar-title" role="heading" aria-level={1}>
-        I FIND U
+        鹊桥引擎
       </div>
 
       <div className="topbar-right">

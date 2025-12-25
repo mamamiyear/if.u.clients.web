@@ -1,70 +1,150 @@
-/* 侧边菜单组件局部样式 */
-.sider-header { border-bottom: 1px solid rgba(255,255,255,0.08); color: var(--text-invert); display: flex; align-items: center; justify-content: space-between; padding: 12px; }
+/* SiderMenu.css - Candy Theme */
 
-/* 收起时图标水平居中（仅 PC 端 Sider 使用） */
-.sider-header.collapsed { justify-content: center; }
-
-.sider-header.collapsed .sider-title,
-.sider-header.collapsed .sider-settings-btn {
-  display: none;
+/* Header Area */
+.sider-header {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-/* 移动端汉堡触发按钮位置 */
-.mobile-menu-trigger {
-  position: fixed;
-  left: 16px;
-  top: 16px;
-  z-index: 1100;
+.sider-user {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
 }
 
-/* 移动端 Drawer 背景与滚动 */
-.mobile-menu-drawer .ant-drawer-body {
-  background: linear-gradient(180deg, rgba(16,185,129,0.12) 0%, rgba(16,185,129,0.22) 100%), var(--bg-sider);
-  padding: 0;
-  height: 100%;
+.sider-avatar-container {
+  position: relative;
 }
 
-/* Dark 菜单项：选中与悬停采用薄荷主色的柔和高亮 */
-.ant-menu-dark .ant-menu-item-selected {
-  background-color: rgba(167, 243, 208, 0.16) !important;
-  color: var(--text-invert) !important;
-}
-.ant-menu-dark .ant-menu-item:hover {
-  background-color: rgba(255, 255, 255, 0.08) !important;
+.sider-avatar-frame {
+  padding: 4px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: var(--shadow-sm);
 }
 
-/* 移动端菜单背景透明以露出侧栏渐变 */
-.mobile-menu-drawer .ant-menu { background: transparent !important; }
-
-/* 统一 Sider 背景为薄荷风格的深色渐变 */
-.ant-layout-sider {
-  background: linear-gradient(180deg, rgba(16,185,129,0.12) 0%, rgba(16,185,129,0.22) 100%), var(--bg-sider) !important;
+.sider-info {
+  text-align: center;
 }
-.ant-layout-sider .ant-menu { background: transparent !important; }
 
-/* Sider 触发按钮（折叠/展开）样式 */
+.sider-title {
+  font-family: "Quicksand", sans-serif;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 16px;
+}
+
+.sider-org {
+  font-size: 12px;
+  color: var(--color-primary);
+  background: rgba(255, 139, 167, 0.1);
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+
+
+/* Menu Styling */
+.ant-menu {
+  background: transparent !important;
+  border-inline-end: none !important;
+  padding: 16px 8px;
+}
+
+.ant-menu-item {
+  border-radius: var(--radius-md) !important;
+  margin-bottom: 8px !important;
+  color: var(--text-secondary) !important;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.ant-menu-item:hover {
+  color: var(--color-primary) !important;
+  background: rgba(255, 255, 255, 0.5) !important;
+  transform: translateX(4px);
+}
+
+.ant-menu-item-selected {
+  background: linear-gradient(90deg, rgba(255, 139, 167, 0.15) 0%, rgba(255, 255, 255, 0) 100%) !important;
+  color: var(--color-primary-600) !important;
+  font-weight: 700;
+}
+
+.ant-menu-item-selected::after {
+  border-right: 3px solid var(--color-primary) !important;
+  transform: scaleY(1) !important;
+  opacity: 1 !important;
+}
+
+/* Sider Trigger */
 .ant-layout-sider-trigger {
-  background: linear-gradient(180deg, rgba(16,185,129,0.18) 0%, rgba(16,185,129,0.28) 100%) !important;
-  color: var(--text-invert) !important;
-  border-top: 1px solid rgba(167, 243, 208, 0.25);
+  background: white !important;
+  color: var(--text-secondary) !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  bottom: 16px !important; /* Move up slightly due to padding */
+  width: calc(100% - 32px) !important; /* Adjust width */
+  left: 16px !important;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
 }
 
-/* 移动端汉堡按钮风格 */
-.mobile-menu-trigger {
-  border: 1px solid rgba(255,255,255,0.16);
-  background: linear-gradient(180deg, rgba(16,185,129,0.12) 0%, rgba(16,185,129,0.24) 100%);
-  color: var(--text-invert);
+/* Mobile Bottom Navigation */
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+  z-index: 1000;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
 }
-.mobile-menu-trigger:hover {
-  background: rgba(16,185,129,0.35);
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex: 1;
+  height: 100%;
+  color: var(--text-secondary);
+  font-size: 10px;
+  transition: all 0.3s;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
-.sider-user { display: inline-flex; align-items: center; gap: 12px; }
-.sider-avatar-container { display: inline-flex; align-items: center; justify-content: center; }
-.sider-avatar-frame { width: 40px; height: 40px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.6); box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; background: #ffffff; }
-.sider-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
-.sider-avatar-icon { font-size: 20px; color: #64748b; }
-.sider-info { display: flex; flex-direction: column; gap: 2px; }
-.sider-title { font-weight: 600; color: #e5e7eb; }
-.sider-org { font-size: 11px; color: rgba(255,255,255,0.45); line-height: 1; }
-.sider-settings-btn { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px; color: #e5e7eb; background: transparent; border: none; cursor: pointer; }
-.sider-settings-btn:hover { background: rgba(255,255,255,0.08); }
+
+.nav-item.active {
+  color: var(--color-primary);
+}
+
+.nav-item .anticon {
+  font-size: 20px;
+  transition: all 0.3s;
+  padding: 8px;
+  border-radius: 16px;
+}
+
+.nav-item.active .anticon {
+  background: rgba(255, 139, 167, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(255, 139, 167, 0.2);
+}

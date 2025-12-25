@@ -15,20 +15,29 @@ function App() {
           justifyContent: 'center', 
           alignItems: 'center', 
           height: '100vh',
-          backgroundColor: '#f5f7fa',
+          background: 'linear-gradient(135deg, #FFF0F5 0%, #E0F7FA 100%)',
         }}
       >
         <div style={{ 
-          fontSize: '24px', 
+          fontSize: '32px', 
           fontWeight: 'bold', 
-          color: '#1677ff', 
+          fontFamily: '"Fredoka", sans-serif',
           marginBottom: '24px',
-          letterSpacing: '2px'
+          background: 'linear-gradient(90deg, #FF6B6B 0%, #FFD93D 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          letterSpacing: '4px'
         }}>
-          I FIND U
+          鹊桥引擎
         </div>
         <Spin size="large" />
-        <div style={{ marginTop: '16px', color: '#999', fontSize: '14px' }}>
+        <div style={{ 
+          marginTop: '16px', 
+          color: '#FF8BA7', 
+          fontSize: '16px',
+          fontFamily: '"Quicksand", sans-serif',
+          fontWeight: 600
+        }}>
           正在加载用户信息...
         </div>
       </div>
@@ -36,7 +45,16 @@ function App() {
   }
 
   return (
-    <ConfigProvider locale={zhCN}>
+    <ConfigProvider
+      locale={zhCN}
+      theme={{
+        token: {
+          colorPrimary: '#FF8BA7',
+          borderRadius: 12,
+          fontFamily: '"Quicksand", "Fredoka", sans-serif',
+        },
+      }}
+    >
       <LayoutWrapper />
     </ConfigProvider>
   );

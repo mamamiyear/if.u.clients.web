@@ -18,7 +18,6 @@ const ExpandedRow: React.FC<ExpandedRowProps> = ({ record, currentUserId, onData
   // 评论相关状态
   const [commentContent, setCommentContent] = useState('');
   const [comments, setComments] = useState<Comment[]>(record.comments || []);
-  const [loadingComments, setLoadingComments] = useState(false);
   const [submittingComment, setSubmittingComment] = useState(false);
   const commentsListRef = useRef<HTMLDivElement>(null);
   const [activeTabKey, setActiveTabKey] = useState('info');
@@ -37,7 +36,6 @@ const ExpandedRow: React.FC<ExpandedRowProps> = ({ record, currentUserId, onData
 
   // 刷新评论列表
   const refreshComments = async () => {
-    setLoadingComments(true);
     try {
       const res = await getCustomComments(record.id);
       if (res.error_code === 0 && res.data) {
@@ -51,8 +49,6 @@ const ExpandedRow: React.FC<ExpandedRowProps> = ({ record, currentUserId, onData
       }
     } catch (error) {
       console.error('刷新评论失败:', error);
-    } finally {
-      setLoadingComments(false);
     }
   };
 

@@ -1,78 +1,115 @@
-/* 全局基础样式 */
+/* Global Base Styles - Candy Theme */
 :root {
-  /* Minty Spring 主题变量 */
-  --color-primary: #A7F3D0; /* 薄荷绿 */
-  --color-primary-600: #10B981; /* 深薄荷绿，用于文本/边框强调 */
-  --color-accent: #F97A7A; /* 珊瑚红（CTA） */
-  --bg-app: #F9F9F9; /* 主内容背景 */
-  --bg-sider: #262626; /* 侧栏与深色顶栏 */
-  --bg-card: #FFFFFF; /* 卡片与输入框背景 */
-  --text-primary: #334155; /* 深石板灰 */
-  --text-secondary: #475569; /* 次要文本 */
-  --text-invert: #E5E7EB; /* 深背景上的浅文本 */
-  --border: #E2E8F0; /* 通用边框 */
-  --muted: #94A3B8; /* 提示文字 */
-  --placeholder: hsla(215, 12%, 35%, 0.15); /* 更淡的占位符 */
-  --focus: #A7F3D0; /* 聚焦外光圈 */
-  --mask: rgba(17, 24, 39, 0.35); /* 遮罩 */
+  /* Candy Theme Palette */
+  --color-primary: #FF8BA7; /* Bubblegum Pink */
+  --color-primary-600: #FF6B8B; /* Darker Pink */
+  --color-secondary: #4ECDC4; /* Fresh Mint */
+  --color-accent: #FFE66D; /* Sunshine Yellow */
+  --color-purple: #C7CEEA; /* Lavender */
+  --color-blue: #A2D2FF; /* Baby Blue */
+  
+  --bg-app: #FFF0F5; /* Lavender Blush Background */
+  --bg-sider: rgba(255, 255, 255, 0.7); /* Glass White */
+  --bg-card: #FFFFFF;
+  
+  --text-primary: #4A4A4A; /* Soft Dark Grey */
+  --text-secondary: #848484; /* Medium Grey */
+  --text-invert: #FFFFFF; 
+  
+  --border: #FFC3D0; /* Soft Pink Border */
+  --muted: #BDBDBD;
+  --placeholder: rgba(74, 74, 74, 0.3);
+  --focus: #FF8BA7;
+  --mask: rgba(74, 74, 74, 0.2);
+
+  /* Radius */
+  --radius-sm: 16px;
+  --radius-md: 24px;
+  --radius-lg: 32px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 4px 12px rgba(255, 139, 167, 0.15);
+  --shadow-md: 0 8px 24px rgba(255, 139, 167, 0.2);
+  --shadow-lg: 0 16px 48px rgba(255, 139, 167, 0.25);
+  
+  /* Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.9);
+  --glass-blur: 20px;
 }
+
 @supports (font-variation-settings: normal) {
   :root { font-synthesis-weight: none; }
 }
 
 html, body, #root {
   height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
-  /* 保留暗色基底，但主内容将使用浅色背景 */
-  background: radial-gradient(1200px 600px at 70% -100px, rgba(92,124,255,0.25) 0%, rgba(92,124,255,0.06) 45%, transparent 60%),
-              radial-gradient(800px 400px at -200px 20%, rgba(120,220,255,0.15) 0%, rgba(120,220,255,0.06) 50%, transparent 70%),
-              #0f172a; /* slate-900 */
-  color: var(--text-invert);
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+  background: 
+    radial-gradient(circle at 10% 20%, rgba(255, 230, 109, 0.4) 0%, transparent 40%),
+    radial-gradient(circle at 90% 10%, rgba(162, 210, 255, 0.4) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(255, 139, 167, 0.1) 0%, transparent 60%),
+    radial-gradient(circle at 20% 80%, rgba(78, 205, 196, 0.3) 0%, transparent 40%),
+    linear-gradient(135deg, #FFF0F5 0%, #F3E5F5 100%);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  font-family: "Quicksand", "Fredoka", ui-sans-serif, system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* 让 Ant Design 的 Layout 充满视口 */
-.app-root {
-  min-height: 100vh;
-}
-
-/* 统一滚动条样式（轻度） */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.2) transparent;
-}
-
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.2);
-  border-radius: 6px;
-}
-
-/* 全局主按钮样式（Ant Design） */
+/* Ant Design Overrides */
 .ant-btn-primary {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-600) 100%);
+  border: none;
+  box-shadow: 0 4px 14px 0 rgba(255, 107, 139, 0.39);
+  border-radius: var(--radius-full);
+  font-weight: 700;
+  height: 40px;
+  padding: 0 24px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 .ant-btn-primary:hover,
 .ant-btn-primary:focus {
-  background: #F06363;
-  border-color: #F06363;
-}
-.ant-btn-primary:disabled {
-  background: #FBC2C2;
-  border-color: #FBC2C2;
-  color: rgba(255,255,255,0.7);
+  background: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary) 100%) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 139, 0.5);
 }
 
-/* 全局更淡的占位符颜色 */
-.ant-input::placeholder,
-.ant-input-affix-wrapper input::placeholder,
-.ant-input-number-input::placeholder,
-textarea::placeholder {
-  color: var(--placeholder) !important;
+.ant-input, .ant-input-affix-wrapper {
+  border-radius: var(--radius-md);
+  border-color: var(--border);
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.9);
+  transition: all 0.3s;
+}
+
+.ant-input:focus, .ant-input-affix-wrapper:focus, .ant-input-affix-wrapper-focused {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(255, 139, 167, 0.2);
+}
+
+.ant-card {
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 139, 167, 0.5);
+  border-radius: 99px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
 }

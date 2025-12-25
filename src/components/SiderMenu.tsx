@@ -1,23 +1,23 @@
+import React from 'react';
+import { Layout, Menu, Grid, Button } from 'antd';
+import { FormOutlined, UnorderedListOutlined, UserOutlined, TeamOutlined, CopyOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/useAuth';
 import LoginModal from './LoginModal';
 import RegisterModal from './RegisterModal';
-import { useAuth } from '../contexts/useAuth';
-import React from 'react';
-import { Layout, Menu, Grid, Drawer, Button } from 'antd';
-import { FormOutlined, UnorderedListOutlined, MenuOutlined, CopyOutlined, UserOutlined, SettingOutlined, TeamOutlined } from '@ant-design/icons';
-import './SiderMenu.css';
-import { useNavigate } from 'react-router-dom';
 import UserAvatar from './UserAvatar';
+import './SiderMenu.css';
 
 const { Sider } = Layout;
 
 type Props = {
   onNavigate?: (key: string) => void;
   selectedKey?: string;
-  mobileOpen?: boolean; // 外部控制移动端抽屉开关
-  onMobileToggle?: (open: boolean) => void; // 顶栏触发开关
+  mobileOpen?: boolean;
+  onMobileToggle?: (open: boolean) => void;
 };
 
-const SiderMenu: React.FC<Props> = ({ onNavigate, selectedKey, mobileOpen, onMobileToggle }) => {
+const SiderMenu: React.FC<Props> = ({ onNavigate, selectedKey }) => {
   const [isLoginModalOpen, setIsLoginModalOpen] = React.useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = React.useState(false);
   const { isAuthenticated, user, login } = useAuth();
@@ -26,23 +26,6 @@ const SiderMenu: React.FC<Props> = ({ onNavigate, selectedKey, mobileOpen, onMob
   const isMobile = !screens.md;
   const [collapsed, setCollapsed] = React.useState(false);
   const [selectedKeys, setSelectedKeys] = React.useState<string[]>(['home']);
-  const [internalMobileOpen, setInternalMobileOpen] = React.useState(false);
-  const [topbarHeight, setTopbarHeight] = React.useState<number>(56);
-
-  React.useEffect(() => {
-    const update = () => {
-      const el = document.querySelector('.topbar') as HTMLElement | null;
-      const h = el?.clientHeight || 56;
-      setTopbarHeight(h);
-    };
-    update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
-  }, []);
-
-  React.useEffect(() => {
-    setCollapsed(isMobile);
-  }, [isMobile]);
 
   React.useEffect(() => {
     if (selectedKey) {
@@ -51,85 +34,47 @@ const SiderMenu: React.FC<Props> = ({ onNavigate, selectedKey, mobileOpen, onMob
   }, [selectedKey]);
 
   const items = [
-    { key: 'custom-list', label: '客户列表', icon: <TeamOutlined /> },
-    { key: 'custom', label: '客户录入', icon: <UserOutlined /> },
-    { key: 'home', label: '录入资源', icon: <FormOutlined /> },
-    { key: 'batch', label: '批量录入', icon: <CopyOutlined /> },
-    { key: 'menu1', label: '资源列表', icon: <UnorderedListOutlined /> },
+    { key: 'custom-list', label: '客户', icon: <TeamOutlined /> },
+    { key: 'custom', label: '录入', icon: <UserOutlined /> },
+    { key: 'home', label: '添加', icon: <FormOutlined /> },
+    { key: 'batch', label: '批量', icon: <CopyOutlined /> },
+    { key: 'menu1', label: '资源', icon: <UnorderedListOutlined /> },
   ];
 
-  const renderSiderHeader = (options?: { setOpen?: (v: boolean) => void; collapsed?: boolean }) => (
-    <div className={`sider-header ${options?.collapsed ? 'collapsed' : ''}`}>
-      {isAuthenticated && user ? (
-        <>
-          <div className="sider-user">
-            <div className="sider-avatar-container">
-              <UserAvatar 
-                user={user} 
-                size={40} 
-                style={{ 
-                  border: '2px solid rgba(255,255,255,0.6)', 
-                  borderRadius: '50%' 
-                }}
-              />
-            </div>
-            <div className="sider-info">
-              <div className="sider-title">{user.nickname}</div>
-              {user.organization && (
-                <div className="sider-org">@{user.organization.name}</div>
-              )}
-            </div>
-          </div>
-          <button type="button" className="sider-settings-btn" aria-label="设置" onClick={() => { navigate('/user'); options?.setOpen?.(false); }}>
-            <SettingOutlined />
-          </button>
-        </>
-      ) : (
-        <>
-          <Button type="primary" style={{ marginRight: 8 }} onClick={() => setIsLoginModalOpen(true)}>登录</Button>
-          <Button onClick={() => setIsRegisterModalOpen(true)}>注册</Button>
-        </>
-      )}
-    </div>
-  );
+  const handleNavigate = (key: string) => {
+    setSelectedKeys([key]);
+    onNavigate?.(key);
+  };
 
+  // Mobile Bottom Navigation
   if (isMobile) {
-    const open = mobileOpen ?? internalMobileOpen;
-    const setOpen = (v: boolean) => (onMobileToggle ? onMobileToggle(v) : setInternalMobileOpen(v));
-    const showInternalTrigger = !onMobileToggle;
     return (
       <>
-        {showInternalTrigger && (
-          <Button
-            className="mobile-menu-trigger"
-            type="default"
-            icon={<MenuOutlined />}
-            onClick={() => setInternalMobileOpen((o) => !o)}
-          />
-        )}
-        <Drawer
-          className="mobile-menu-drawer"
-          placement="left"
-          width="100%"
-          open={open}
-          onClose={() => setOpen(false)}
-          rootStyle={{ top: topbarHeight, height: `calc(100% - ${topbarHeight}px)` }}
-          styles={{ body: { padding: 0 }, header: { display: 'none' } }}
-        >
-          {renderSiderHeader({ setOpen })}
-          <Menu
-            theme="dark"
-            mode="inline"
-            selectedKeys={selectedKeys}
-            onClick={({ key }) => {
-              const k = String(key);
-              setSelectedKeys([k]);
-              setOpen(false);
-              onNavigate?.(k);
-            }}
-            items={items}
-          />
-        </Drawer>
+        <div className="mobile-bottom-nav">
+          {items.map(item => (
+            <button
+              key={item.key}
+              className={`nav-item ${selectedKeys.includes(item.key) ? 'active' : ''}`}
+              onClick={() => handleNavigate(item.key)}
+            >
+              {item.icon}
+              <span>{item.label}</span>
+            </button>
+          ))}
+          {/* User Profile Tab */}
+          <button
+            className="nav-item"
+            onClick={() => isAuthenticated ? navigate('/user') : setIsLoginModalOpen(true)}
+          >
+            {isAuthenticated && user ? (
+              <UserAvatar user={user} size={24} />
+            ) : (
+              <UserOutlined />
+            )}
+            <span>{isAuthenticated ? '我的' : '登录'}</span>
+          </button>
+        </div>
+        
         <LoginModal
           open={isLoginModalOpen}
           onCancel={() => setIsLoginModalOpen(false)}
@@ -144,36 +89,67 @@ const SiderMenu: React.FC<Props> = ({ onNavigate, selectedKey, mobileOpen, onMob
     );
   }
 
+  // Desktop Floating Sider
   return (
     <Sider
-      theme="dark"
+      theme="light"
       collapsible
       collapsed={collapsed}
       onCollapse={(value) => setCollapsed(value)}
       className="sider-menu"
       width={240}
     >
-      {renderSiderHeader({ collapsed })}
+      <div className={`sider-header ${collapsed ? 'collapsed' : ''}`}>
+         {isAuthenticated && user ? (
+            <div 
+              className="sider-user" 
+              onClick={() => navigate('/user')}
+              role="button"
+              tabIndex={0}
+              title="查看个人资料"
+            >
+              <div className="sider-avatar-container">
+                <div className="sider-avatar-frame">
+                  <UserAvatar user={user} size={collapsed ? 32 : 56} />
+                </div>
+              </div>
+              {!collapsed && (
+                <div className="sider-info">
+                  <div className="sider-title">{user.nickname}</div>
+                  {user.organization && <div className="sider-org">{user.organization.name}</div>}
+                </div>
+              )}
+            </div>
+         ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
+              {!collapsed && (
+                 <>
+                  <Button type="primary" block onClick={() => setIsLoginModalOpen(true)}>登录</Button>
+                  <Button block onClick={() => setIsRegisterModalOpen(true)}>注册</Button>
+                 </>
+              )}
+              {collapsed && (
+                 <Button type="primary" shape="circle" icon={<UserOutlined />} onClick={() => setIsLoginModalOpen(true)} />
+              )}
+            </div>
+         )}
+      </div>
       <Menu
-        theme="dark"
+        theme="light"
         mode="inline"
         selectedKeys={selectedKeys}
-        onClick={({ key }) => {
-          const k = String(key);
-          setSelectedKeys([k]);
-          onNavigate?.(k);
-        }}
+        onClick={({ key }) => handleNavigate(String(key))}
         items={items}
       />
-      <LoginModal
-        open={isLoginModalOpen}
-        onCancel={() => setIsLoginModalOpen(false)}
-        onOk={async (values) => {
-          await login(values);
-          setIsLoginModalOpen(false);
-        }}
-        title="登录"
-      />
+       <LoginModal
+          open={isLoginModalOpen}
+          onCancel={() => setIsLoginModalOpen(false)}
+          onOk={async (values) => {
+            await login(values);
+            setIsLoginModalOpen(false);
+          }}
+          title="登录"
+        />
       <RegisterModal open={isRegisterModalOpen} onCancel={() => setIsRegisterModalOpen(false)} />
     </Sider>
   );

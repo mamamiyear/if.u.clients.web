@@ -4,7 +4,7 @@ import 'react-image-crop/dist/ReactCrop.css'
 import ReactCrop, { centerCrop, makeAspectCrop, type Crop } from 'react-image-crop'
 import { useAuth } from '../contexts/useAuth'
 import { updateMe, deleteUser, uploadAvatar, updatePhone, updateEmail } from '../apis'
-import { UserOutlined, EditOutlined } from '@ant-design/icons'
+import { EditOutlined } from '@ant-design/icons'
 import LoginModal from './LoginModal';
 import UserAvatar from './UserAvatar';
 import { useNavigate } from 'react-router-dom'

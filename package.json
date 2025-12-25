@@ -13,6 +13,7 @@
     "@ant-design/icons": "^6.1.0",
     "@ant-design/v5-patch-for-react-19": "^1.0.3",
     "antd": "^5.27.0",
+    "framer-motion": "^12.23.26",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-image-crop": "^11.0.10",

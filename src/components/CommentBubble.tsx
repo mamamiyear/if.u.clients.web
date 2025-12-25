@@ -86,7 +86,7 @@ const CommentBubble: React.FC<CommentBubbleProps> = ({
       try {
         await onUpdate(comment.id, editContent);
         setIsEditModalVisible(false);
-      } catch (error) {
+      } catch {
         // 错误处理由父组件或 API 层处理，这里主要是关闭 loading
       } finally {
         setUpdating(false);

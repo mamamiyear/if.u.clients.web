@@ -17,7 +17,6 @@ const LayoutWrapper: React.FC = () => {
   const location = useLocation();
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
-  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [inputOpen, setInputOpen] = React.useState(false);
   const isResourceInput = location.pathname === '/resource/register';
   const isList = location.pathname === '/resources';
@@ -77,10 +76,9 @@ const LayoutWrapper: React.FC = () => {
 
   return (
     <Layout className={`layout-wrapper app-root ${isMobile ? 'layout-mobile' : 'layout-desktop'}`}>
-      {/* 顶部标题栏，位于左侧菜单栏之上 */}
+      {/* 顶部标题栏 */}
       <TopBar
-        onToggleMenu={() => {setInputOpen(false); setMobileMenuOpen((v) => !v);}}
-        onToggleInput={() => {if (isResourceInput || isList || isBatch) {setMobileMenuOpen(false); setInputOpen((v) => !v);}}}
+        onToggleInput={() => {if (isResourceInput || isList || isBatch) {setInputOpen((v) => !v);}}}
         showInput={isResourceInput || isList || isBatch}
       />
       {/* 下方为主布局：左侧菜单 + 右侧内容 */}
@@ -88,8 +86,6 @@ const LayoutWrapper: React.FC = () => {
         <SiderMenu
           onNavigate={handleNavigate}
           selectedKey={selectedKey}
-          mobileOpen={mobileMenuOpen}
-          onMobileToggle={(open) => setMobileMenuOpen(open)}
         />
         <Layout>
           <Routes>

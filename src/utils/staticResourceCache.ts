@@ -241,7 +241,7 @@ export function clearExpiredCache() {
             urlsToRemove.push(key.replace(CACHE_PREFIX, ''));
           }
         }
-      } catch (e) {
+      } catch {
         // 格式错误等情况，直接清理
         keysToRemove.push(key);
       }
