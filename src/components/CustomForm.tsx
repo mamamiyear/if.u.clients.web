@@ -367,11 +367,6 @@ const CustomForm: React.FC<CustomFormProps> = ({ initialData, hideSubmitButton =
           </Col>
         </Row>
 
-        {/* Row 13: 备注评论 (KeyValueList) */}
-        <Form.Item name="comments" label="备注评论">
-          <KeyValueList />
-        </Form.Item>
-
         {!hideSubmitButton && (
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={loading} block size="large">
